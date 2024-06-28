@@ -14,23 +14,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping(name = "enterprises")
+@RequestMapping("/enterprises")
 public class EnterpriseController {
     @Autowired
     private EnterpriseService enterpriseService;
 
     @PostMapping
     public ResponseEntity<ResponseMessageStatus> createEnterprise(@RequestBody EnterpriseDTO enterprise, UriComponentsBuilder uriBuilder){
-        EnterpriseDTO enterpriseDTO=enterpriseService.createEnterpriseService(enterprise);
+        ResponseMessageStatus enterpriseDTO=enterpriseService.createEnterpriseService(enterprise);
         URI path = uriBuilder.path("/enterprises/{id}").buildAndExpand(enterprise.id()).toUri();
 
-        String message="Empresa criada com sucesso!";
-        Integer status = 201;
-        ResponseMessageStatus responseMessageStatus = new ResponseMessageStatus(
-                message,
-                status
-        );
-
-        return ResponseEntity.created(path).body(responseMessageStatus);
+        return ResponseEntity.created(path).body(enterpriseDTO);
     }
 }
