@@ -1,10 +1,7 @@
 package com.waitomo.sistema_rh.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "tb_enterprises")
@@ -12,6 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
+@ToString
 public class Enterprise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
