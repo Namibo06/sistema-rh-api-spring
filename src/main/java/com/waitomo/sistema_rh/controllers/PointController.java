@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/point")
+@RequestMapping("tb_point")
 public class PointController {
     @Autowired
     private PointService service;
