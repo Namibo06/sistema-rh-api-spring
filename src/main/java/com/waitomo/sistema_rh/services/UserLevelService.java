@@ -6,6 +6,7 @@ import com.waitomo.sistema_rh.models.UserLevel;
 import com.waitomo.sistema_rh.repositories.EnterpriseRepository;
 import com.waitomo.sistema_rh.repositories.UserLevelRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +18,21 @@ public class UserLevelService {
     @Autowired
     private EnterpriseRepository enterpriseRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     public ResponseMessageStatus createUserLevelService(UserLevelDTO userLevel){
-        UserLevel userLevelModel = new UserLevel();
+        UserLevel userLevelModel = modelMapper.map(userLevel, UserLevel.class);
         userLevelModel.setName(userLevel.name());
         if(!existEnterpriseId(userLevel.enterprise_id())){
             throw new EntityNotFoundException("ID da empresa não encontrado");
         }
 
-        userLevelModel.setEnterprise_id(userLevelModel.getEnterprise_id());
+        userLevelModel.setEnterprise_id(userLevel.enterprise_id());
         repository.save(userLevelModel);
 
-        final String message = "Nível de usuário criado com sucesso";
-        final Integer status = 201;
+        String message = "Nível de usuário criado com sucesso";
+        Integer status = 201;
 
         return new ResponseMessageStatus(message,status);
     }
