@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/address")
@@ -17,8 +20,9 @@ public class EmployeeAddressController {
     private ViacepService viacepService;
 
     @PostMapping
-    public ResponseEntity<ResponseMessageStatus> verifyAddress(@RequestBody String cep){
+    public ResponseEntity<ResponseMessageStatus> verifyAddress(@RequestBody String cep, UriComponentsBuilder uriBuilder){
         ResponseMessageStatus employeeAddressDTO = viacepService.verifyAddressService(cep);
-        return ResponseEntity.ok(employeeAddressDTO);
+        URI path = uriBuilder.path("address/{cep}").buildAndExpand(cep).toUri();
+        return ResponseEntity.created(path).body(employeeAddressDTO);
     }
 }
