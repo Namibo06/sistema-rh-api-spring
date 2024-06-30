@@ -25,5 +25,7 @@ public class EnterpriseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Void> enterpriseById
+    public ResponseEntity<String> enterpriseById(){
+        return ResponseEntity.ok("");
+    }
 }
