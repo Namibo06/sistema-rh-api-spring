@@ -1,10 +1,7 @@
 package com.waitomo.sistema_rh.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +14,7 @@ import java.util.List;
 @Table(name = "tb_employee")
 @Getter
 @Setter
+@Data
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class Employee implements UserDetails{
@@ -54,6 +52,11 @@ public class Employee implements UserDetails{
     @Override
     public String getUsername() {
         return login;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
     }
 
     @Override
