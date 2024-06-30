@@ -1,6 +1,9 @@
 package com.waitomo.sistema_rh.controllers;
 
 import com.waitomo.sistema_rh.dtos.LoginResponseDTO;
+import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
+import com.waitomo.sistema_rh.services.LoginService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,16 +18,30 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 @RequestMapping("/login")
 public class LoginController {
     @Autowired
-    private AuthenticationManager authenticationManager;
+    private AuthenticationManager auth;
 
+    @Autowired
+    private LoginService service;
 
     @PostMapping
-    public ResponseEntity<LoginResponseDTO> authentication(@RequestBody LoginResponseDTO credentials){
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(credentials.login(),credentials.password());
-        Authentication authentication = authenticationManager.authenticate(token);
+    public ResponseEntity<ResponseMessageStatus> login(@RequestBody LoginResponseDTO credentials){
+        try {
 
-        //pegar o serviço pra criar token
+            boolean existsEmployee=service.findEmployeeByLoginAndPassword(credentials);
+            if(!existsEmployee){
+                throw new EntityNotFoundException("Funcionário não encontrado");
+            }
 
-        //pegar serviço pra atualizar token ao usuário
+            String tokenCreated = service.createToken();
+
+            ResponseMessageStatus response = service.updateTokenByUser(credentials.login(),tokenCreated);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            String message=e.getMessage();
+            Integer status = 404;
+
+            ResponseMessageStatus response = new ResponseMessageStatus(message,status);
+            return ResponseEntity.ok(response);
+        }
     }
 }
