@@ -6,6 +6,7 @@ import com.waitomo.sistema_rh.models.Employee;
 import com.waitomo.sistema_rh.repositories.EmployeeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +16,9 @@ public class EmployeeService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     public ResponseMessageStatus createEmployeeService(EmployeeDTO employeeDTO){
         Employee employeeModel = modelMapper.map(employeeDTO, Employee.class);
@@ -27,7 +31,7 @@ public class EmployeeService {
         employeeModel.setCnpjEnterprise(employeeDTO.cnpjEnterprise());
         employeeModel.setUserLevel(employeeDTO.userLevel());
         employeeModel.setLogin(employeeDTO.login());
-        employeeModel.setPassword(employeeDTO.password());
+        employeeModel.setPassword(encoder.encode(employeeDTO.password()));
         employeeModel.setToken(employeeDTO.token());
 
         repository.save(employeeModel);
