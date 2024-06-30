@@ -7,7 +7,4 @@ public record EmployeeAddressDTO (
         String neighborhood,
         String road
 ){
-    public EmployeeAddressDTO() {
-        this( null,null,null,null,null);
-    }
 }
