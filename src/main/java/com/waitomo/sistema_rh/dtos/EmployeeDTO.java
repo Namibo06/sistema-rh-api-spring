@@ -22,4 +22,5 @@ public record EmployeeDTO(
         String password,
         String token
 ) {
+    public EmployeeDTO(){this(null,null,null,null,null,null,null,null,null,null,null,null);}
 }
