@@ -46,7 +46,7 @@ public class TestEmployee {
 
     @Test
     public void testCreateEmployee(){
-        EmployeeDTO employeeDTO = new EmployeeDTO(null,"Joalisson","Maia", LocalDate.of(2003,10,06),"masculino",getMockSector().getId(),getMockEmployeeAddress().getCep(),getMockEnterprise().getCnpj(),getMockUserLevel().getId(),"joca@gmail.com","123","null");
+        EmployeeDTO employeeDTO = new EmployeeDTO(null,"Joca",null, LocalDate.of(2003,10,06),"masculino",getMockSector().getId(),getMockEmployeeAddress().getCep(),getMockEnterprise().getCnpj(),getMockUserLevel().getId(),"teste@gmail.com","123","null");
         ResponseMessageStatus result = service.createEmployeeService(employeeDTO);
         assertNotNull(result);
     }
