@@ -9,6 +9,7 @@ import com.waitomo.sistema_rh.repositories.EmployeeAddressRepository;
 import com.waitomo.sistema_rh.repositories.EnterpriseRepository;
 import com.waitomo.sistema_rh.repositories.SectorRepository;
 import com.waitomo.sistema_rh.repositories.UserLevelRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -79,6 +80,39 @@ public class EnterpriseService {
                 message,
                 status
         );
+    }
+
+    //testar
+    public void findAllEnterprises(){
+      enterpriseRepository.findAll();
+    }
+
+    //testar
+    public void findEnterpriseById(Long id){
+        existsEnterprise(id);
+        enterpriseRepository.findById(id);
+    }
+
+    public void updateEnterpriseById(){
+
+    }
+
+    //testar
+    public void deleteEnterpriseById(Long id){
+        boolean existsEnterprise=existsEnterprise(id);
+        if(!existsEnterprise){
+            throw new RuntimeException("Empresa não existe");
+        }
+        enterpriseRepository.deleteById(id);
+    }
+
+    public boolean existsEnterprise(Long id){
+        boolean existEnterprise=enterpriseRepository.existsById(id);
+
+        if(!existEnterprise){
+            throw new EntityNotFoundException("ID da empresa não encontrado");
+        }
+        return true;
     }
 
     public Long createUserLevelByEnterprise(Long enterpriseId){
