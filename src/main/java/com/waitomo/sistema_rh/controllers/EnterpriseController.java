@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/enterprises")
@@ -19,9 +20,14 @@ public class EnterpriseController {
     @PostMapping
     public ResponseEntity<ResponseMessageStatus> createEnterprise(@RequestBody EnterpriseDTO enterprise, UriComponentsBuilder uriBuilder){
         ResponseMessageStatus enterpriseDTO=enterpriseService.createEnterpriseService(enterprise);
-        URI path = uriBuilder.path("/enterprises/{id}").buildAndExpand(enterprise.id()).toUri();
+        URI path = uriBuilder.path("/enterprises/{id}").buildAndExpand(enterprise.getId()).toUri();
 
         return ResponseEntity.created(path).body(enterpriseDTO);
+    }
+
+    @GetMapping
+    public List<EnterpriseDTO> enterprises(){
+        return enterpriseService.findAllEnterprises();
     }
 
     //implementar metodo do README
