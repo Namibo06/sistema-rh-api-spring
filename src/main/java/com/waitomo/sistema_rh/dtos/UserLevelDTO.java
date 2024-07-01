@@ -5,4 +5,7 @@ public record UserLevelDTO(
         String name,
         Long enterprise_id
 ) {
+    public UserLevelDTO() {
+        this(null, null, null);
+    }
 }
