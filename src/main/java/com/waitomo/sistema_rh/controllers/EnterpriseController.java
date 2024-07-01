@@ -24,6 +24,7 @@ public class EnterpriseController {
         return ResponseEntity.created(path).body(enterpriseDTO);
     }
 
+    //implementar metodo do README
     @GetMapping("/{id}")
     public ResponseEntity<String> enterpriseById(){
         return ResponseEntity.ok("");
