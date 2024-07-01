@@ -5,4 +5,7 @@ public record SectorDTO (
         String name,
         Long enterprise_id
 ) {
+    public SectorDTO() {
+        this(null, null, null);
+    }
 }
