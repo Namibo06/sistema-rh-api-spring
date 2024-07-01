@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class EnterpriseService {
@@ -40,7 +42,7 @@ public class EnterpriseService {
     public ResponseMessageStatus createEnterpriseService(EnterpriseDTO enterprise){
         Enterprise enterpriseModel = new Enterprise();
 
-        enterpriseModel.setCnpj(enterprise.cnpj());
+        enterpriseModel.setCnpj(enterprise.getCnpj());
         if(enterpriseModel.getCnpj() == null || enterpriseModel.getCnpj().isEmpty()){
             throw  new IllegalArgumentException("O campo de CNPJ não pode ser nulo ou vazio");
         }
@@ -48,9 +50,9 @@ public class EnterpriseService {
             throw new IllegalArgumentException("O campo de CNPJ precisa conter 14 caracteres");
         }
 
-        enterpriseModel.setFantasy_name(enterprise.fantasy_name());
-        enterpriseModel.setCompany_name(enterprise.company_name());
-        enterpriseModel.setNumber_employees(enterprise.number_employees());
+        enterpriseModel.setFantasy_name(enterprise.getFantasy_name());
+        enterpriseModel.setCompany_name(enterprise.getCompany_name());
+        enterpriseModel.setNumber_employees(enterprise.getNumber_employee());
 
         Enterprise enterpriseCreated=enterpriseRepository.save(enterpriseModel);
 
@@ -82,9 +84,15 @@ public class EnterpriseService {
         );
     }
 
-    //testar
-    public void findAllEnterprises(){
-      enterpriseRepository.findAll();
+    public List<EnterpriseDTO> findAllEnterprises(){
+      List<Enterprise> enterprises=enterpriseRepository.findAll();
+      List<EnterpriseDTO> enterpriseListDTO = new ArrayList<>();
+
+      for (Enterprise enterprise: enterprises){
+          EnterpriseDTO enterpriseDTO = modelMapper.map(enterprise, EnterpriseDTO.class);
+          enterpriseListDTO.add(enterpriseDTO);
+      }
+      return enterpriseListDTO;
     }
 
     //testar
