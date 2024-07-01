@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
 
+    boolean existsById(Long id);
 }
