@@ -17,15 +17,25 @@ class SistemaRhApplicationTests {
 
 	@Test
 	public void testCreateEnterprise(){
-		EnterpriseDTO dto = new EnterpriseDTO(null, "12345678912345", "nome ficticio", "nome empresarial", null);
+		EnterpriseDTO dto = new EnterpriseDTO();
+		dto.setId(null);
+		dto.setCnpj("12345678912345");
+		dto.setFantasy_name("nome ficticio");
+		dto.setCompany_name("nome empresarial");
+		dto.setNumber_employee(null);
 		ResponseMessageStatus result = enterpriseService.createEnterpriseService(dto);
 		assertNotNull(result);
 	}
 
 	@Test
 	public void testCnpjLength(){
-		EnterpriseDTO dto = new EnterpriseDTO(null, "1234567891245", "nome ficticio", "nome empresarial", null);
-		assertEquals(dto.cnpj().length(),14);
+		EnterpriseDTO dto = new EnterpriseDTO();
+		dto.setId(null);
+		dto.setCnpj("1234567891245");
+		dto.setFantasy_name("nome ficticio");
+		dto.setCompany_name("nome empresarial");
+		dto.setNumber_employee(null);
+		assertEquals(dto.getCnpj().length(),14);
 	}
 
 }
