@@ -116,12 +116,6 @@ public class EnterpriseService {
         enterpriseRepository.deleteById(id);
     }
 
-    public void updateNumberEmployee(String cnpj){
-        Enterprise enterprise= enterpriseRepository.findByCnpj(cnpj);
-        enterprise.setNumber_employees(enterprise.getNumber_employees() + 1);
-        enterpriseRepository.save(enterprise);
-    }
-
     public boolean existsEnterprise(Long id){
         boolean existEnterprise=enterpriseRepository.existsById(id);
 
