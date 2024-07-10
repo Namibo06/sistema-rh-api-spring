@@ -44,11 +44,6 @@ public class LoginService {
             Date expirationDate = new Date(now.getTime() + 3600 * 1000 * 3);
             Algorithm algorithm = Algorithm.HMAC256("WaitomoHiper12çCorporation");
 
-            System.out.println(JWT.create()
-                    .withIssuer("Sistema RH")
-                    .withExpiresAt(expirationDate)
-                    .sign(algorithm));
-
             return JWT.create()
                     .withIssuer("Sistema RH")
                     .withExpiresAt(expirationDate)
