@@ -4,6 +4,9 @@ import com.waitomo.sistema_rh.dtos.EnterpriseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.services.EnterpriseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -26,8 +29,10 @@ public class EnterpriseController {
     }
 
     @GetMapping
-    public List<EnterpriseDTO> enterprises(){
-        return enterpriseService.findAllEnterprises();
+    public ResponseEntity<Page<EnterpriseDTO>> enterprises(@PageableDefault(size = 15)Pageable pageable){
+        Page<EnterpriseDTO> enterprises=enterpriseService.findAllEnterprises(pageable);
+
+        return ResponseEntity.ok(enterprises);
     }
 
     //implementar metodo do README
