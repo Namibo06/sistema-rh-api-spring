@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EnterpriseRepository extends JpaRepository<Enterprise, Long> {
+    Enterprise findByCnpj(String cnpj);
 
     boolean existsById(Long id);
 }
