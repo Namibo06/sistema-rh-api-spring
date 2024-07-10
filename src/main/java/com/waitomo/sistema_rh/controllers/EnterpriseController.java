@@ -29,16 +29,22 @@ public class EnterpriseController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<EnterpriseDTO>> enterprises(@PageableDefault(size = 15)Pageable pageable){
+    public ResponseEntity<Page<EnterpriseDTO>> getAllEnterprises(@PageableDefault(size = 15)Pageable pageable){
         Page<EnterpriseDTO> enterprises=enterpriseService.findAllEnterprises(pageable);
 
         return ResponseEntity.ok(enterprises);
     }
 
-    //implementar metodo do README
     @GetMapping("/{id}")
-    public ResponseEntity<EnterpriseDTO> enterpriseById(@PathVariable Long id){
+    public ResponseEntity<EnterpriseDTO> getEnterpriseById(@PathVariable Long id){
         EnterpriseDTO enterpriseDTO = enterpriseService.findEnterpriseById(id);
         return ResponseEntity.ok(enterpriseDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEnterpriseById(@PathVariable Long id){
+        enterpriseService.deleteEnterpriseById(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
