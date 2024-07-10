@@ -32,7 +32,8 @@ public class EnterpriseController {
 
     //implementar metodo do README
     @GetMapping("/{id}")
-    public ResponseEntity<String> enterpriseById(){
-        return ResponseEntity.ok("");
+    public ResponseEntity<EnterpriseDTO> enterpriseById(@PathVariable Long id){
+        EnterpriseDTO enterpriseDTO = enterpriseService.findEnterpriseById(id);
+        return ResponseEntity.ok(enterpriseDTO);
     }
 }
