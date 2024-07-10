@@ -12,6 +12,8 @@ import com.waitomo.sistema_rh.repositories.UserLevelRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +55,7 @@ public class EnterpriseService {
 
         enterpriseModel.setFantasy_name(enterprise.getFantasy_name());
         enterpriseModel.setCompany_name(enterprise.getCompany_name());
-        enterpriseModel.setNumber_employees(enterprise.getNumber_employee());
+        enterpriseModel.setNumber_employees(enterprise.getNumber_employees());
 
         Enterprise enterpriseCreated=enterpriseRepository.save(enterpriseModel);
 
@@ -85,22 +87,19 @@ public class EnterpriseService {
         );
     }
 
-    public List<EnterpriseDTO> findAllEnterprises(){
-        List<Enterprise> enterprises=enterpriseRepository.findAll();
-        List<EnterpriseDTO> enterpriseListDTO = new ArrayList<>();
-
-        for (Enterprise enterprise: enterprises){
-            EnterpriseDTO enterpriseDTO = modelMapper.map(enterprise, EnterpriseDTO.class);
-            enterpriseListDTO.add(enterpriseDTO);
-        }
-        return enterpriseListDTO;
+    public Page<EnterpriseDTO> findAllEnterprises(Pageable pageable){
+        return enterpriseRepository
+                .findAll(pageable)
+                .map(enterprise ->
+                    modelMapper.map(enterprise,EnterpriseDTO.class)
+                );
     }
 
     public EnterpriseDTO findEnterpriseById(Long id){
         existsEnterprise(id);
-        Optional<Enterprise> enterprise=enterpriseRepository.findById(id);
-        System.out.println("Empresa:"+enterprise);
-        return modelMapper.map(enterprise,EnterpriseDTO.class);
+        Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada"));
+
+        return modelMapper.map(enterprise, EnterpriseDTO.class);
     }
 
     public void updateEnterpriseById(){
