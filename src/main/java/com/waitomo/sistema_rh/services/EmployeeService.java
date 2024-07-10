@@ -1,8 +1,10 @@
 package com.waitomo.sistema_rh.services;
 
 import com.waitomo.sistema_rh.dtos.EmployeeDTO;
+import com.waitomo.sistema_rh.dtos.EnterpriseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.models.Employee;
+import com.waitomo.sistema_rh.models.Enterprise;
 import com.waitomo.sistema_rh.repositories.EmployeeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Service;
 public class EmployeeService {
     @Autowired
     private EmployeeRepository repository;
+
+    @Autowired
+    private EnterpriseService enterpriseService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -35,6 +40,8 @@ public class EmployeeService {
         employeeModel.setToken(employeeDTO.token());
 
         repository.save(employeeModel);
+
+        enterpriseService.updateNumberEmployee(employeeDTO.cnpjEnterprise());
 
         String message="Funcionário criado com sucesso";
         Integer status=201;
