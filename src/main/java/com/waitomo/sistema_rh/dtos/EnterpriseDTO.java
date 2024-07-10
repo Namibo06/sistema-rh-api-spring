@@ -10,5 +10,5 @@ public class EnterpriseDTO{
     private String cnpj;
     private String fantasy_name;
     private String company_name;
-    private Integer number_employee;
+    private Integer number_employees;
 }
