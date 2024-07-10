@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EnterpriseService {
@@ -85,20 +86,21 @@ public class EnterpriseService {
     }
 
     public List<EnterpriseDTO> findAllEnterprises(){
-      List<Enterprise> enterprises=enterpriseRepository.findAll();
-      List<EnterpriseDTO> enterpriseListDTO = new ArrayList<>();
+        List<Enterprise> enterprises=enterpriseRepository.findAll();
+        List<EnterpriseDTO> enterpriseListDTO = new ArrayList<>();
 
-      for (Enterprise enterprise: enterprises){
-          EnterpriseDTO enterpriseDTO = modelMapper.map(enterprise, EnterpriseDTO.class);
-          enterpriseListDTO.add(enterpriseDTO);
-      }
-      return enterpriseListDTO;
+        for (Enterprise enterprise: enterprises){
+            EnterpriseDTO enterpriseDTO = modelMapper.map(enterprise, EnterpriseDTO.class);
+            enterpriseListDTO.add(enterpriseDTO);
+        }
+        return enterpriseListDTO;
     }
 
-    //testar
-    public void findEnterpriseById(Long id){
+    public EnterpriseDTO findEnterpriseById(Long id){
         existsEnterprise(id);
-        enterpriseRepository.findById(id);
+        Optional<Enterprise> enterprise=enterpriseRepository.findById(id);
+        System.out.println("Empresa:"+enterprise);
+        return modelMapper.map(enterprise,EnterpriseDTO.class);
     }
 
     public void updateEnterpriseById(){
@@ -112,6 +114,12 @@ public class EnterpriseService {
             throw new RuntimeException("Empresa não existe");
         }
         enterpriseRepository.deleteById(id);
+    }
+
+    public void updateNumberEmployee(String cnpj){
+        Enterprise enterprise= enterpriseRepository.findByCnpj(cnpj);
+        enterprise.setNumber_employees(enterprise.getNumber_employees() + 1);
+        enterpriseRepository.save(enterprise);
     }
 
     public boolean existsEnterprise(Long id){
