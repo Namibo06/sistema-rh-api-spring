@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserLevelDTO {
-    Long id;
-    String name;
-    Long enterprise_id;
+    private Long id;
+    private String name;
+    private Long enterprise_id;
 }
