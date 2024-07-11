@@ -74,6 +74,19 @@ public class SectorService {
         return modelMapper.map(sector, SectorDTO.class);
     }
 
+    public ResponseMessageStatus updateSectorByIdService(Long id,SectorDTO sectorDTO){
+        existsSectorById(id);
+
+        Sector sector = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Setor não encontrado"));
+        sector.setName(sectorDTO.getName());
+        sector.setEnterprise_id(sectorDTO.getEnterprise_id());
+        repository.save(sector);
+
+        String message = "Setor atualizado com sucesso";
+        Integer status = 200;
+        return new ResponseMessageStatus(message,status);
+    }
+
     public boolean existSector(String name,Long enterprise_id){
         Long existSector = repository.existsByNameAndEntepriseId(name,enterprise_id);
 
