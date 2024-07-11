@@ -9,6 +9,8 @@ import com.waitomo.sistema_rh.repositories.SectorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -32,14 +34,14 @@ public class SectorService {
         final String MESSAGE_BAD="ID da Empresa não encontrado";
         final Integer STATUS_BAD=404;
 
-        if(!existEnterpriseId(sectorDTO.enterprise_id())){
+        if(!existEnterpriseId(sectorDTO.getEnterprise_id())){
             return new ResponseMessageStatus(
                     MESSAGE_BAD,
                     STATUS_BAD
             );
         }
 
-        boolean existSectorName=existSector(sectorDTO.name(),sectorDTO.enterprise_id());
+        boolean existSectorName=existSector(sectorDTO.getName(),sectorDTO.getEnterprise_id());
 
         if(existSectorName){
             return new ResponseMessageStatus(
@@ -48,8 +50,8 @@ public class SectorService {
             );
         }else{
             Sector sectorModel = modelMapper.map(sectorDTO, Sector.class);
-            sectorModel.setName(sectorDTO.name());
-            sectorModel.setEnterprise_id(sectorDTO.enterprise_id());
+            sectorModel.setName(sectorDTO.getName());
+            sectorModel.setEnterprise_id(sectorDTO.getEnterprise_id());
             repository.save(sectorModel);
 
             return new ResponseMessageStatus(
@@ -59,14 +61,16 @@ public class SectorService {
         }
     }
 
+    public Page<SectorDTO> getAllSectorService(Pageable pageable){
+        return repository
+                .findAll(pageable)
+                .map(sector -> modelMapper.map(sector, SectorDTO.class));
+    }
+
     public boolean existSector(String name,Long enterprise_id){
         Long existSector = repository.existsByNameAndEntepriseId(name,enterprise_id);
 
-        if(existSector != 0 ){
-            return true;
-        }else{
-            return false;
-        }
+        return existSector != 0;
     }
 
     public boolean existEnterpriseId(Long id){
