@@ -40,4 +40,11 @@ public class PointController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseMessageStatus> updatePointById(@PathVariable Long id,@RequestBody PointDTO pointDTO){
+        ResponseMessageStatus response = service.updatePointByIdService(id,pointDTO);
+
+        return ResponseEntity.ok(response);
+    }
 }
