@@ -1,11 +1,12 @@
 package com.waitomo.sistema_rh.dtos;
 
-public record SectorDTO (
-        Long id,
-        String name,
-        Long enterprise_id
-) {
-    public SectorDTO() {
-        this(null, null, null);
-    }
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class SectorDTO{
+    Long id;
+    String name;
+    Long enterprise_id;
 }
