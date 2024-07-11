@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping("tb_point")
+@RequestMapping("point")
 public class PointController {
     @Autowired
     private PointService service;
@@ -22,7 +22,7 @@ public class PointController {
     @PostMapping
     public ResponseEntity<ResponseMessageStatus> createPoint(@RequestBody PointDTO pointDTO, UriComponentsBuilder uriBuilder){
         ResponseMessageStatus response = service.createPointService(pointDTO);
-        URI path = uriBuilder.path("/point/{id}").buildAndExpand(pointDTO.id()).toUri();
+        URI path = uriBuilder.path("/point/{id}").buildAndExpand(pointDTO.getId()).toUri();
 
         return ResponseEntity.created(path).body(response);
     }
@@ -30,6 +30,13 @@ public class PointController {
     @GetMapping
     public ResponseEntity<Page<PointDTO>> getAllPoint(@PageableDefault(size = 15) Pageable pageable){
         Page<PointDTO> response = service.getAllPointService(pageable);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PointDTO> getPointById(@PathVariable Long id){
+        PointDTO response = service.getPointByIdService(id);
 
         return ResponseEntity.ok(response);
     }
