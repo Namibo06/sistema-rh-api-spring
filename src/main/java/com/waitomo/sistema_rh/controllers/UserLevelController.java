@@ -33,4 +33,11 @@ public class UserLevelController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserLevelDTO> getUserLevelById(@PathVariable Long id){
+        UserLevelDTO response = service.getUserLevelByIdService(id);
+
+        return ResponseEntity.ok(response);
+    }
 }
