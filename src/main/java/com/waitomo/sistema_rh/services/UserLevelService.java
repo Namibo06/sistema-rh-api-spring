@@ -54,6 +54,19 @@ public class UserLevelService {
         return modelMapper.map(userLevel, UserLevelDTO.class);
     }
 
+    public ResponseMessageStatus updateUserLevelByIdService(Long id,UserLevelDTO userLevelDTO){
+        existsUserLevel(id);
+
+        UserLevel userLevel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nível de Usuário nnão encontrado"));
+        userLevel.setName(userLevelDTO.getName());
+        userLevel.setEnterprise_id(userLevelDTO.getEnterprise_id());
+        repository.save(userLevel);
+
+        String message = "Nível de usuário atualizado com sucesso";
+        Integer status = 200;
+        return new ResponseMessageStatus(message,status);
+    }
+
     public void existsUserLevel(Long id){
         boolean existsUserLevelById = repository.existsById(id);
 
