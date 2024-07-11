@@ -75,6 +75,12 @@ public class PointService {
         return new ResponseMessageStatus(message,status);
     }
 
+    public void deletPointeById(Long id){
+        existsPoint(id);
+
+        repository.deleteById(id);
+    }
+
     public void existsPoint(Long id){
         boolean existsPoint = repository.existsById(id);
 
