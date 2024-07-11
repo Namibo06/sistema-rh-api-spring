@@ -67,10 +67,25 @@ public class SectorService {
                 .map(sector -> modelMapper.map(sector, SectorDTO.class));
     }
 
+    public SectorDTO getSectorByIdService(Long id){
+        existsSectorById(id);
+
+        Sector sector = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Setor não encontrado"));
+        return modelMapper.map(sector, SectorDTO.class);
+    }
+
     public boolean existSector(String name,Long enterprise_id){
         Long existSector = repository.existsByNameAndEntepriseId(name,enterprise_id);
 
         return existSector != 0;
+    }
+
+    public void existsSectorById(Long id){
+        boolean existsSector = repository.existsById(id);
+
+        if(!existsSector){
+            throw new EntityNotFoundException("Setor não encontrado");
+        }
     }
 
     public boolean existEnterpriseId(Long id){
