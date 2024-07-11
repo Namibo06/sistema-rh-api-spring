@@ -17,16 +17,16 @@ import java.util.Date;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class EmployeeDTO{
-    Long id;
-    String firstName;
-    String lastName;
-    LocalDate dateNasciment;
-    String gender;
-    Long sector;
-    String cep;
-    String cnpjEnterprise;
-    Long userLevel;
-    String login;
-    String password;
-    String token;
+    private Long id;
+    private String firstName;
+    private String lastName;
+    private LocalDate dateNasciment;
+    private String gender;
+    private Long sector;
+    private String cep;
+    private String cnpjEnterprise;
+    private Long userLevel;
+    private String login;
+    private String password;
+    private String token;
 }
