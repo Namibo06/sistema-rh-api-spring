@@ -8,11 +8,11 @@ import java.time.LocalTime;
 @Getter
 @Setter
 public class PointDTO{
-    Long id;
-    Long employeeId;
-    LocalDate date;
-    LocalTime checkInTime;
-    LocalTime checkOutLunch;
-    LocalTime backLunch;
-    LocalTime checkOutTime;
+    private Long id;
+    private Long employeeId;
+    private LocalDate date;
+    private LocalTime checkInTime;
+    private LocalTime checkOutLunch;
+    private LocalTime backLunch;
+    private LocalTime checkOutTime;
 }
