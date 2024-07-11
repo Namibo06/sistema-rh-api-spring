@@ -1,16 +1,18 @@
 package com.waitomo.sistema_rh.dtos;
 
+import lombok.Getter;
+import lombok.Setter;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public record PointDTO(
-        Long id,
-        Long employeeId,
-        LocalDate date,
-        LocalTime chekInTime,
-        LocalTime checkOutLunch,
-        LocalTime backLunch,
-        LocalTime CheckOutTime
-){
+@Getter
+@Setter
+public class PointDTO{
+    Long id;
+    Long employeeId;
+    LocalDate date;
+    LocalTime checkInTime;
+    LocalTime checkOutLunch;
+    LocalTime backLunch;
+    LocalTime checkOutTime;
 }
