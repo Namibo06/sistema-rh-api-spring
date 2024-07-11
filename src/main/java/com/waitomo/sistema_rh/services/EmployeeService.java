@@ -7,6 +7,7 @@ import com.waitomo.sistema_rh.models.Employee;
 import com.waitomo.sistema_rh.models.Enterprise;
 import com.waitomo.sistema_rh.repositories.EmployeeRepository;
 import com.waitomo.sistema_rh.repositories.EnterpriseRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -54,6 +55,14 @@ public class EmployeeService {
         return repository
                 .findAll(pageable)
                 .map(employee -> modelMapper.map(employee, EmployeeDTO.class));
+    }
+
+    public void existsEmployee(Long id){
+        boolean existsEmployeeById = repository.existsById(id);
+
+        if(!existsEmployeeById){
+            throw new EntityNotFoundException("Funcionário não encontrado");
+        }
     }
 
     public void updateNumberEmployee(String cnpj){
