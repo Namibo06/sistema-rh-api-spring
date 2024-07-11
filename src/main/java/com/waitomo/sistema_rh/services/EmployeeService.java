@@ -9,6 +9,8 @@ import com.waitomo.sistema_rh.repositories.EmployeeRepository;
 import com.waitomo.sistema_rh.repositories.EnterpriseRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,24 +30,30 @@ public class EmployeeService {
 
     public ResponseMessageStatus createEmployeeService(EmployeeDTO employeeDTO){
         Employee employeeModel = modelMapper.map(employeeDTO, Employee.class);
-        employeeModel.setFirstName(employeeDTO.firstName());
-        employeeModel.setLastName(employeeDTO.lastName());
-        employeeModel.setDateNasciment(employeeDTO.dateNasciment());
-        employeeModel.setGender(employeeDTO.gender());
-        employeeModel.setSector(employeeDTO.sector());
-        employeeModel.setCep(employeeDTO.cep());
-        employeeModel.setCnpjEnterprise(employeeDTO.cnpjEnterprise());
-        employeeModel.setUserLevel(employeeDTO.userLevel());
-        employeeModel.setLogin(employeeDTO.login());
-        employeeModel.setPassword(encoder.encode(employeeDTO.password()));
-        employeeModel.setToken(employeeDTO.token());
+        employeeModel.setFirstName(employeeDTO.getFirstName());
+        employeeModel.setLastName(employeeDTO.getLastName());
+        employeeModel.setDateNasciment(employeeDTO.getDateNasciment());
+        employeeModel.setGender(employeeDTO.getGender());
+        employeeModel.setSector(employeeDTO.getSector());
+        employeeModel.setCep(employeeDTO.getCep());
+        employeeModel.setCnpjEnterprise(employeeDTO.getCnpjEnterprise());
+        employeeModel.setUserLevel(employeeDTO.getUserLevel());
+        employeeModel.setLogin(employeeDTO.getLogin());
+        employeeModel.setPassword(encoder.encode(employeeDTO.getPassword()));
+        employeeModel.setToken(employeeDTO.getToken());
         repository.save(employeeModel);
 
-        updateNumberEmployee(employeeDTO.cnpjEnterprise());
+        updateNumberEmployee(employeeDTO.getCnpjEnterprise());
 
         String message="Funcionário criado com sucesso";
         Integer status=201;
         return new ResponseMessageStatus(message,status);
+    }
+
+    public Page<EmployeeDTO> getAllEmployeeService(Pageable pageable){
+        return repository
+                .findAll(pageable)
+                .map(employee -> modelMapper.map(employee, EmployeeDTO.class));
     }
 
     public void updateNumberEmployee(String cnpj){
