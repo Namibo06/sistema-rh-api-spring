@@ -40,4 +40,11 @@ public class UserLevelController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseMessageStatus> updateUserLevelById(@PathVariable Long id,@RequestBody UserLevelDTO userLevelDTO){
+        ResponseMessageStatus response = service.updateUserLevelByIdService(id,userLevelDTO);
+
+        return ResponseEntity.ok(response);
+    }
 }
