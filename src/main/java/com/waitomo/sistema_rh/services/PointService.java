@@ -33,10 +33,10 @@ public class PointService {
 
         pointModel.setEmployeeId(pointDTO.getEmployeeId());
         pointModel.setDate(pointDTO.getDate());
-        pointModel.setCheckInTime(LocalTime.parse(formatterLocalTime(pointDTO.getCheckInTime())));
-        pointModel.setCheckOutLunch(LocalTime.parse(formatterLocalTime(pointDTO.getCheckOutLunch())));
-        pointModel.setBackLunch(LocalTime.parse(formatterLocalTime(pointDTO.getBackLunch())));
-        pointModel.setCheckOutTime(LocalTime.parse(formatterLocalTime(pointDTO.getCheckOutTime())));
+        pointModel.setCheckInTime(pointDTO.getCheckInTime());
+        pointModel.setCheckOutLunch(pointDTO.getCheckOutLunch());
+        pointModel.setBackLunch(pointDTO.getBackLunch());
+        pointModel.setCheckOutTime(pointDTO.getCheckOutTime());
 
         repository.save(pointModel);
 
@@ -56,10 +56,6 @@ public class PointService {
 
         Point point = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ponto não encontrado"));
         return modelMapper.map(point, PointDTO.class);
-    }
-
-    public String formatterLocalTime(LocalTime localTime){
-        return localTime.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 
     public void existsEmployee(Long id){
