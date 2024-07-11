@@ -54,14 +54,12 @@ public class UserLevelService {
         return modelMapper.map(userLevel, UserLevelDTO.class);
     }
 
-    public boolean existsUserLevel(Long id){
+    public void existsUserLevel(Long id){
         boolean existsUserLevelById = repository.existsById(id);
 
         if(!existsUserLevelById){
             throw new EntityNotFoundException("Nível de Usuário não encontrado");
         }
-
-        return true;
     }
 
     public boolean existEnterpriseId(Long id){
