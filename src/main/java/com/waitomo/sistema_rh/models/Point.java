@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "point")
+@Table(name = "tb_point")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -23,8 +23,8 @@ public class Point {
     private Long employeeId;
     @Column(nullable = false)
     private LocalDate date;
-    private LocalTime chekInTime;
+    private LocalTime checkInTime;
     private LocalTime checkOutLunch;
     private LocalTime backLunch;
-    private LocalTime CheckOutTime;
+    private LocalTime checkOutTime;
 }
