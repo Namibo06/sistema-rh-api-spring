@@ -47,4 +47,11 @@ public class SectorController {
 
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteSectorById(@PathVariable Long id){
+        service.deleteSectorByIdService(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }
