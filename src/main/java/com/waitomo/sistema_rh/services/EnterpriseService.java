@@ -102,12 +102,23 @@ public class EnterpriseService {
         return modelMapper.map(enterprise, EnterpriseDTO.class);
     }
 
-    public void updateEnterpriseById(){
+    public ResponseMessageStatus updateEnterpriseByIdService(Long id,EnterpriseDTO enterpriseDTO){
+        existsEnterprise(id);
+        Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada"));
 
+        enterprise.setCnpj(enterpriseDTO.getCnpj());
+        enterprise.setFantasy_name(enterpriseDTO.getFantasy_name());
+        enterprise.setCompany_name(enterpriseDTO.getCompany_name());
+        enterprise.setNumber_employees(enterpriseDTO.getNumber_employees());
+        enterpriseRepository.save(enterprise);
+
+        String message = "Empresa atualizada com sucesso";
+        Integer status = 200;
+
+        return new ResponseMessageStatus(message,status);
     }
 
-    //testar
-    public void deleteEnterpriseById(Long id){
+    public void deleteEnterpriseByIdService(Long id){
         boolean existsEnterprise=existsEnterprise(id);
         if(!existsEnterprise){
             throw new RuntimeException("Empresa não existe");
