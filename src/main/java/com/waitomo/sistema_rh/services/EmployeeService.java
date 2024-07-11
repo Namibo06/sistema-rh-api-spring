@@ -57,6 +57,35 @@ public class EmployeeService {
                 .map(employee -> modelMapper.map(employee, EmployeeDTO.class));
     }
 
+    public EmployeeDTO getEmployeeByIdService(Long id){
+        existsEmployee(id);
+
+        Employee employee = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+        return modelMapper.map(employee, EmployeeDTO.class);
+    }
+
+    public ResponseMessageStatus updateEmployeeByIdService(Long id,EmployeeDTO employeeDTO){
+        existsEmployee(id);
+
+        Employee employee = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+        employee.setFirstName(employeeDTO.getFirstName());
+        employee.setLastName(employeeDTO.getLastName());
+        employee.setDateNasciment(employeeDTO.getDateNasciment());
+        employee.setGender(employeeDTO.getGender());
+        employee.setSector(employeeDTO.getSector());
+        employee.setCep(employeeDTO.getCep());
+        employee.setCnpjEnterprise(employeeDTO.getCnpjEnterprise());
+        employee.setUserLevel(employeeDTO.getUserLevel());
+        employee.setLogin(employeeDTO.getLogin());
+        employee.setPassword(encoder.encode(employeeDTO.getPassword()));
+        employee.setToken(employeeDTO.getToken());
+        repository.save(employee);
+
+        String message = "Funcionário atualizado com sucesso";
+        Integer status = 200;
+        return new ResponseMessageStatus(message,status);
+    }
+
     public void existsEmployee(Long id){
         boolean existsEmployeeById = repository.existsById(id);
 
