@@ -22,7 +22,7 @@ public class UserLevelController {
     @PostMapping
     public ResponseEntity<ResponseMessageStatus> createUserLevel(@RequestBody UserLevelDTO userLevel, UriComponentsBuilder uriBuilder){
         ResponseMessageStatus response = service.createUserLevelService(userLevel);
-        URI path = uriBuilder.path("user_level/{id}").buildAndExpand(userLevel.id()).toUri();
+        URI path = uriBuilder.path("user_level/{id}").buildAndExpand(userLevel.getId()).toUri();
 
         return ResponseEntity.created(path).body(response);
     }
