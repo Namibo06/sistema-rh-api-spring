@@ -87,6 +87,12 @@ public class SectorService {
         return new ResponseMessageStatus(message,status);
     }
 
+    public void deleteSectorByIdService(Long id){
+        existsSectorById(id);
+
+        repository.deleteById(id);
+    }
+
     public boolean existSector(String name,Long enterprise_id){
         Long existSector = repository.existsByNameAndEntepriseId(name,enterprise_id);
 
