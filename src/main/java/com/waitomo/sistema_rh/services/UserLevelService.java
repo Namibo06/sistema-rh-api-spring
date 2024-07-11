@@ -67,6 +67,12 @@ public class UserLevelService {
         return new ResponseMessageStatus(message,status);
     }
 
+    public void deleteUserLevelByIdService(Long id){
+        existsUserLevel(id);
+
+        repository.deleteById(id);
+    }
+
     public void existsUserLevel(Long id){
         boolean existsUserLevelById = repository.existsById(id);
 
