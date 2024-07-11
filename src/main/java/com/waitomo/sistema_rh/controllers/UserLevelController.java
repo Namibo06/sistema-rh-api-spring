@@ -47,4 +47,11 @@ public class UserLevelController {
 
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUserLevelById(@PathVariable Long id){
+        service.deleteUserLevelByIdService(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }
