@@ -198,6 +198,44 @@
 --------------------------------------------------------------
 
 ## Repositories
+### • EnterpriseRepository
+#### O primeiro método,é o ```Enterprise findByCnpj(String cnpj)```,do tipo Enterprise,e recebe um cnpj do tipo String como parâmetro.Sua finalidade é buscar uma empresa pelo cnpj..
+#### O segundo método,é o ```boolean existsById(Long id)```,do tipo boolean,e recebe um id do tipo Long como parâmetro.Sua finalidade é ver se existe uma empresa ou não pelo id.
+
+<br>
+
+### • SectorRepository
+#### O único método do repository,é do tipo Long,e recebe por parâmetros,name do tipo String e enterprise_id do tipo Long.Sua finalidade é buscar um setor pelo name e enterprise_id  
+```
+@Query(value = "SELECT CASE WHEN COUNT(s.name) > 0 THEN true ELSE false END FROM tb_sector as s WHERE s.name = :name AND s.enterprise_id = :enterprise_id",nativeQuery = true)
+Long existsByNameAndEntepriseId(String name,Long enterprise_id)
+```
+
+<br>
+
+### • UserLevelRepository
+#### Não tem métodos
+
+<br>
+
+### • EmployeeAddressRepository
+#### O primeiro método,é do tipo Long,e recebe cep do tipo String como parâmetro.Sua finalidade é verificar se um endereço existe pelo cep.
+```
+@Query(value = "SELECT CASE WHEN COUNT(e.cep) > 0 THEN true ELSE false END FROM tb_employee_address e WHERE e.cep = :cep",nativeQuery = true)
+Long existsByCep(@Param("cep") String cep);
+```
+
+#### O segundo método,é o ```EmployeeAddress findAddressByCep(String cep)```,do tipo EmployeeAddress,e recebe um cep do tipo String como parâmetro.Sua finalidade é buscar um endereço pelo cep.
+
+<br>
+
+### • EmployeeRepository
+#### O único método,é o ```Optional<Employee> findByLogin(String login)```,do tipo Optional<Employee>,e recebe por parâmetro um login do tipo String.Sua finalidade é buscar um funcionário que pode existir ou não,pelo login.
+
+<br>
+
+### • PointRepository
+#### Não tem métodos
 
 <br>
 
@@ -215,15 +253,9 @@
 //No login será o seguinte:
 //-tenho cnpj pelo funcionário que ira verificar de qual
 //empresa é,recuperando o id_da_empresa irei colocar nos
-/cookies ou localStorage do front
+//cookies ou localStorage do front
 
-//fazer os cruds:
--enterprise ✔
--userLevel ✔
--sector ✔
--employee ✔
--point ✔
 
 // fazer login do funcionario,e deixar rotas restritas através do security
 // fazer consultas select com join para trazer os dados de userLevel por exemplo,trazendo o nome em vez do numero
-// falta documentar
+// falta documentar services e controllers
