@@ -41,9 +41,16 @@ public class EnterpriseController {
         return ResponseEntity.ok(enterpriseDTO);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseMessageStatus> updateEnterpriseById(@PathVariable Long id,@RequestBody EnterpriseDTO enterpriseDTO){
+        ResponseMessageStatus response = enterpriseService.updateEnterpriseByIdService(id,enterpriseDTO);
+
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEnterpriseById(@PathVariable Long id){
-        enterpriseService.deleteEnterpriseById(id);
+        enterpriseService.deleteEnterpriseByIdService(id);
 
         return ResponseEntity.noContent().build();
     }
