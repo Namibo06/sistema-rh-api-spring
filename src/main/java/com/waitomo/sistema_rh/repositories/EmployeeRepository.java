@@ -10,9 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee,Long> {
-    //UserDetails findByLogin(String login);
-
-    boolean existsByLoginAndPassword(String login,String password);
 
     Optional<Employee> findByLogin(String login);
 }
