@@ -52,10 +52,18 @@ public class PointService {
     }
 
     public PointDTO getPointByIdService(Long id){
-        existsEmployee(id);
+        existsPoint(id);
 
         Point point = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ponto não encontrado"));
         return modelMapper.map(point, PointDTO.class);
+    }
+
+    public void existsPoint(Long id){
+        boolean existsPoint = repository.existsById(id);
+
+        if(!existsPoint){
+            throw new EntityNotFoundException("Ponto não encontrado");
+        }
     }
 
     public void existsEmployee(Long id){
