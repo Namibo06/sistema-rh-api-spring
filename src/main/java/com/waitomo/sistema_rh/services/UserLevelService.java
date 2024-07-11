@@ -50,7 +50,7 @@ public class UserLevelService {
     public UserLevelDTO getUserLevelByIdService(Long id){
         existsUserLevel(id);
 
-        Optional<UserLevel> userLevel = repository.findById(id);
+        UserLevel userLevel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nível de Usuário nnão encontrado"));
         return modelMapper.map(userLevel, UserLevelDTO.class);
     }
 
