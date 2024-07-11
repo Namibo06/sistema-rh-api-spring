@@ -12,6 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 @Service
 public class PointService {
     @Autowired
@@ -25,15 +28,15 @@ public class PointService {
 
     public ResponseMessageStatus createPointService(PointDTO pointDTO){
         Point pointModel = modelMapper.map(pointDTO, Point.class);
-        if(!existsEmployee(pointDTO.employeeId())){
-            throw new EntityNotFoundException("ID do Funcionário não encontrado");
-        }
-        pointModel.setEmployeeId(pointDTO.employeeId());
-        pointModel.setDate(pointDTO.date());
-        pointModel.setChekInTime(pointDTO.chekInTime());
-        pointModel.setCheckOutLunch(pointDTO.checkOutLunch());
-        pointModel.setBackLunch(pointDTO.backLunch());
-        pointModel.setCheckOutTime(pointDTO.CheckOutTime());
+
+        System.out.println(pointDTO.getEmployeeId());
+
+        pointModel.setEmployeeId(pointDTO.getEmployeeId());
+        pointModel.setDate(pointDTO.getDate());
+        pointModel.setCheckInTime(LocalTime.parse(formatterLocalTime(pointDTO.getCheckInTime())));
+        pointModel.setCheckOutLunch(LocalTime.parse(formatterLocalTime(pointDTO.getCheckOutLunch())));
+        pointModel.setBackLunch(LocalTime.parse(formatterLocalTime(pointDTO.getBackLunch())));
+        pointModel.setCheckOutTime(LocalTime.parse(formatterLocalTime(pointDTO.getCheckOutTime())));
 
         repository.save(pointModel);
 
@@ -48,7 +51,22 @@ public class PointService {
                 .map(point -> modelMapper.map(point, PointDTO.class));
     }
 
-    public boolean existsEmployee(Long id){
-        return employeeRepository.existsById(id);
+    public PointDTO getPointByIdService(Long id){
+        existsEmployee(id);
+
+        Point point = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ponto não encontrado"));
+        return modelMapper.map(point, PointDTO.class);
+    }
+
+    public String formatterLocalTime(LocalTime localTime){
+        return localTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+    }
+
+    public void existsEmployee(Long id){
+       boolean existsEmployee = employeeRepository.existsById(id);
+
+       if(!existsEmployee){
+           throw new EntityNotFoundException("ID do Funcionário não encontrado");
+       }
     }
 }
