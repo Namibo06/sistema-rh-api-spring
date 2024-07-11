@@ -120,8 +120,80 @@
 --------------------------------------------------------------
 
 ## DTOs
+### • ResponseMessageStatus
+#### message - String
+#### status - Integer
 
 <br>
+
+### • TokenResponse
+#### login - String
+#### token - String
+
+<br>
+
+### • LoginResponseDTO
+#### login - String
+#### password - String
+
+<br>
+
+### • EnterpriseDTO
+#### id - Long
+#### cnpj - String
+#### fantasy_name - String
+#### company_name - String
+#### number_employees - Integer
+
+<br>
+
+### • SectorDTO
+#### id - Long
+#### name - String
+#### enterprise_id - Long
+
+<br>
+
+### • UserLevelDTO
+#### id - Long
+#### name - String
+#### enterprise_id - Long
+
+<br>
+
+### • EmployeeAddressDTO
+#### cep - String
+#### uf - String
+#### city - String
+#### neighborhood - String
+#### road - String
+
+<br>
+
+### • EmployeeDTO
+#### id - Long
+#### firstName - String
+#### lastName - String
+#### dateNasciment - LocalDate
+#### gender - String
+#### sector - Long
+#### cep - String
+#### cnpjEnterprise - String
+#### userLevel - Long
+#### login - String
+#### password - String
+#### token - String
+
+<br>
+
+### • PointDTO
+#### id - Long
+#### employeeId - Long
+#### date - LocalDate
+#### checkInTime - LocalDate
+#### checkOutLunch - LocalDate
+#### backLunch - LocalDate
+#### checkOutTime - LocalDate
 
 --------------------------------------------------------------
 
