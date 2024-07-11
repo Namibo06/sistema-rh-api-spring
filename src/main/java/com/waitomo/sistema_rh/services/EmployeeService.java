@@ -86,6 +86,12 @@ public class EmployeeService {
         return new ResponseMessageStatus(message,status);
     }
 
+    public void deleteEmployeeById(Long id){
+        existsEmployee(id);
+
+        repository.deleteById(id);
+    }
+
     public void existsEmployee(Long id){
         boolean existsEmployeeById = repository.existsById(id);
 
