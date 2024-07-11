@@ -8,6 +8,8 @@ import com.waitomo.sistema_rh.repositories.UserLevelRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,6 +37,12 @@ public class UserLevelService {
         Integer status = 201;
 
         return new ResponseMessageStatus(message,status);
+    }
+
+    public Page<UserLevelDTO> getAllUserLevelService(Pageable pageable){
+        return repository.
+                findAll(pageable).
+                map(userLevel -> modelMapper.map(userLevel, UserLevelDTO.class));
     }
 
     public boolean existEnterpriseId(Long id){
