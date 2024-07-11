@@ -32,4 +32,18 @@ public class EmployeeController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id){
+        EmployeeDTO response = service.getEmployeeByIdService(id);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseMessageStatus> updateEmployeeById(@PathVariable Long id,@RequestBody EmployeeDTO employeeDTO){
+        ResponseMessageStatus response = service.updateEmployeeByIdService(id,employeeDTO);
+
+        return ResponseEntity.ok(response);
+    }
 }
