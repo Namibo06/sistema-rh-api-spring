@@ -4,6 +4,9 @@ import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.dtos.SectorDTO;
 import com.waitomo.sistema_rh.services.SectorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -19,8 +22,15 @@ public class SectorController {
     @PostMapping
     public ResponseEntity<ResponseMessageStatus> createSector(@RequestBody SectorDTO sector, UriComponentsBuilder uriBuilder){
         ResponseMessageStatus response = service.createSector(sector);
-        URI path = uriBuilder.path("sector/{id}").buildAndExpand(sector.id()).toUri();
+        URI path = uriBuilder.path("sector/{id}").buildAndExpand(sector.getId()).toUri();
 
         return ResponseEntity.created(path).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<SectorDTO>> getAllSector(@PageableDefault(size = 15) Pageable pageable){
+        Page<SectorDTO> response = service.getAllSectorService(pageable);
+
+        return ResponseEntity.ok(response);
     }
 }
