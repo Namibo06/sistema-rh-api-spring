@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserLevelService {
     @Autowired
@@ -25,12 +27,12 @@ public class UserLevelService {
 
     public ResponseMessageStatus createUserLevelService(UserLevelDTO userLevel){
         UserLevel userLevelModel = modelMapper.map(userLevel, UserLevel.class);
-        userLevelModel.setName(userLevel.name());
-        if(!existEnterpriseId(userLevel.enterprise_id())){
+        userLevelModel.setName(userLevel.getName());
+        if(!existEnterpriseId(userLevel.getEnterprise_id())){
             throw new EntityNotFoundException("ID da empresa não encontrado");
         }
 
-        userLevelModel.setEnterprise_id(userLevel.enterprise_id());
+        userLevelModel.setEnterprise_id(userLevel.getEnterprise_id());
         repository.save(userLevelModel);
 
         String message = "Nível de usuário criado com sucesso";
@@ -40,9 +42,26 @@ public class UserLevelService {
     }
 
     public Page<UserLevelDTO> getAllUserLevelService(Pageable pageable){
-        return repository.
-                findAll(pageable).
-                map(userLevel -> modelMapper.map(userLevel, UserLevelDTO.class));
+        return repository
+                .findAll(pageable)
+                .map(userLevel -> modelMapper.map(userLevel, UserLevelDTO.class));
+    }
+
+    public UserLevelDTO getUserLevelByIdService(Long id){
+        existsUserLevel(id);
+
+        Optional<UserLevel> userLevel = repository.findById(id);
+        return modelMapper.map(userLevel, UserLevelDTO.class);
+    }
+
+    public boolean existsUserLevel(Long id){
+        boolean existsUserLevelById = repository.existsById(id);
+
+        if(!existsUserLevelById){
+            throw new EntityNotFoundException("Nível de Usuário não encontrado");
+        }
+
+        return true;
     }
 
     public boolean existEnterpriseId(Long id){
