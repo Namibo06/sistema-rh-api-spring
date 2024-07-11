@@ -33,4 +33,11 @@ public class SectorController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<SectorDTO> getSectorById(@PathVariable Long id){
+        SectorDTO response = service.getSectorByIdService(id);
+
+        return ResponseEntity.ok(response);
+    }
 }
