@@ -1,23 +1,18 @@
 package com.waitomo.sistema_rh.services;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.waitomo.sistema_rh.dtos.EmployeeDTO;
 import com.waitomo.sistema_rh.dtos.LoginResponseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.models.Employee;
-import com.waitomo.sistema_rh.models.Sector;
 import com.waitomo.sistema_rh.repositories.EmployeeRepository;
 import com.waitomo.sistema_rh.repositories.SectorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
