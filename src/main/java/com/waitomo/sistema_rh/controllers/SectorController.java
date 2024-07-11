@@ -40,4 +40,11 @@ public class SectorController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseMessageStatus> updateSetorById(@PathVariable Long id,@RequestBody SectorDTO sectorDTO){
+        ResponseMessageStatus response = service.updateSectorByIdService(id,sectorDTO);
+
+        return ResponseEntity.ok(response);
+    }
 }
