@@ -58,6 +58,23 @@ public class PointService {
         return modelMapper.map(point, PointDTO.class);
     }
 
+    public ResponseMessageStatus updatePointByIdService(Long id,PointDTO pointDTO){
+        existsPoint(id);
+
+        Point point = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ponto não encontrado"));
+        point.setEmployeeId(pointDTO.getEmployeeId());
+        point.setDate(pointDTO.getDate());
+        point.setCheckInTime(pointDTO.getCheckInTime());
+        point.setBackLunch(pointDTO.getBackLunch());
+        point.setCheckOutLunch(pointDTO.getCheckOutLunch());
+        point.setCheckOutTime(pointDTO.getCheckOutTime());
+        repository.save(point);
+
+        String message = "Ponto atualizado com sucesso";
+        Integer status = 200;
+        return new ResponseMessageStatus(message,status);
+    }
+
     public void existsPoint(Long id){
         boolean existsPoint = repository.existsById(id);
 
