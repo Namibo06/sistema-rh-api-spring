@@ -1,8 +1,11 @@
 package com.waitomo.sistema_rh.services;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.waitomo.sistema_rh.dtos.EmployeeDTO;
 import com.waitomo.sistema_rh.dtos.LoginResponseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
@@ -48,8 +51,23 @@ public class LoginService {
         }
     }
 
-    public void verifyToken(){
+    public ResponseMessageStatus verifyToken(Long id,String token){
+        try{
+            Algorithm algorithm = Algorithm.HMAC256("WaitomoHiper12çCorporation");
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withIssuer("Sistema RH")
+                    .build();
 
+            DecodedJWT decodedJWT = verifier.verify(token);
+
+            String message = "Token validado com sucesso";
+            Integer status = 200;
+            return new ResponseMessageStatus(message,status);
+        }catch (JWTVerificationException e){
+            throw new JWTVerificationException("Falha ao validar token: ",e);
+        }catch (Exception e){
+            throw new RuntimeException("Hove uma falha: ",e);
+        }
     }
 
     public ResponseMessageStatus updateTokenByUser(String login, String token){
