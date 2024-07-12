@@ -2,14 +2,12 @@ package com.waitomo.sistema_rh.controllers;
 
 import com.waitomo.sistema_rh.dtos.LoginResponseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
+import com.waitomo.sistema_rh.dtos.TokenResponse;
 import com.waitomo.sistema_rh.services.LoginService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/login")
@@ -37,5 +35,12 @@ public class LoginController {
             ResponseMessageStatus response = new ResponseMessageStatus(message,status);
             return ResponseEntity.ok(response);
         }
+    }
+
+    @PostMapping("/token/{id}")
+    public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id, @RequestBody TokenResponse tokenResponse){
+        ResponseMessageStatus response = service.verifyToken(id,tokenResponse.token());
+
+        return ResponseEntity.ok(response);
     }
 }
