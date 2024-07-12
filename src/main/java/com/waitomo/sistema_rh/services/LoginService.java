@@ -92,13 +92,4 @@ public class LoginService {
         }
         return false;
     }
-
-   /* public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDetails employee = repository.findByLogin(username);
-        if (employee == null) {
-            throw new UsernameNotFoundException("Usuário não encontrado com o login: " + username);
-        }
-        return employee;
-    }*/
-
 }
