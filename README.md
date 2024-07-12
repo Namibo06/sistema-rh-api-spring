@@ -243,10 +243,99 @@ Long existsByCep(@Param("cep") String cep);
 
 ## Services
 
+### ▪ LoginService
+#### Depêndencias Injetadas:
+##### repository - Acessa repositório do funcionário
+##### sectorRepository - Acessa repositório do setor
+##### modelMapper - Mapea dados,mais especificamente DTO para model e vice-versa
+##### encoder - Criptografa senhas
+
+#### • createToken
+```
+public String createToken(){
+    try{
+        Date now = new Date();
+        Date expirationDate = new Date(now.getTime() + 3600 * 1000 * 3);
+        Algorithm algorithm = Algorithm.HMAC256("WaitomoHiper12çCorporation");
+
+        return JWT.create()
+                .withIssuer("Sistema RH")
+                .withExpiresAt(expirationDate)
+                .sign(algorithm);
+    }catch (JWTCreationException e){
+        throw new RuntimeException("Falha ao criar token: "+e);
+    }
+}
+```
+#### O método retorna uma String e não recebe parâmetros.
+#### No bloco try,é setado uma variável "now" do tipo Date,que recebe uma nova instãncia da classe Date,é setado uma outra variável "expirationDate" do tipo Date,que recebe new Date e como argumento,recupera a hora da variável "now" e adiciona mais 1 hora,é setado logo após uma variável algorithm do tipo Algortihm,que recebe o tipo que será criptografado de Algorithm passando a chave secreta como argumento.
+#### Retorna o método create do JWT,na qual passa quem é responsável pelo token,a sua data de expiração,e a sua assinatura. 
+#### No bloco catch,é acessado caso seja uma exceção do tipo JWTCreationException,e é lançado caso caia neste bloco uma nova exceção RuntimeException com uma mensagem personalizada junto da variável que recupera a mensagem de erro.
+
+<br>
+
+#### • verifyToken
+
+```
+public ResponseMessageStatus verifyToken(Long id,String token){
+    try{
+        Algorithm algorithm = Algorithm.HMAC256("WaitomoHiper12çCorporation");
+        JWTVerifier verifier = JWT.require(algorithm)
+                .withIssuer("Sistema RH")
+                .build();
+
+        DecodedJWT decodedJWT = verifier.verify(token);
+
+        String message = "Token validado com sucesso";
+        Integer status = 200;
+        return new ResponseMessageStatus(message,status);
+    }catch (JWTVerificationException e){
+        throw new JWTVerificationException("Falha ao validar token: ",e);
+    }catch (Exception e){
+        throw new RuntimeException("Hove uma falha: ",e);
+    }
+}
+```
+#### O método retorna ResponseMessageStatus e recebe por parâmetros,id do tipo Long,e token do tipo String.
+#### No bloco try,é setado uma variável algorithm do tipo Algortihm,que recebe o tipo que será criptografado de Algorithm passando a chave secreta como argumento,é setado outra variável verifier do tipo JWTVerifier,que acessa o método require do JWT passando a variável algorithm,declarando de quem foi feito,e realizando um build,é setado outra variável decodeJWT do tipo DecodeJWT que recebe a variável verifier e acessa seu método verify passando como argumento o token.
+#### É setado message do tipo String que passa uma mensagem personalizada,é setado um status com valor personalizado,e retorna uma nova instância de ResponseMessageStatus,passando message e status como argumento.
+#### No primeiro bloco catch,é verificado se atende a JWTVerificationException,se for é lançada uma exceção JWTVerificationException com mensagem personalizada junto com a variável que captura o erro,no segundo bloco catch é verificado se for uma Exception e lança uma exceção RuntimeException com mensagem personalizada junto a variável que captura o erro. 
+
+<br>
+
+#### • updateTokenByUser
+
+```
+public ResponseMessageStatus updateTokenByUser(String login, String token){
+    Optional<Employee> employee = repository.findByLogin(login);
+    if (employee.isEmpty()) {
+        throw new EntityNotFoundException("Funcionário não encontrado");
+    }
+
+    Employee employeeModel = employee.get();
+
+    if(token.isEmpty()){
+        throw new IllegalArgumentException("Token nulo ou vazio");
+    }
+
+    employeeModel.setToken(token);
+    repository.save(employeeModel);
+
+    String message = "Token criado e atualizado com sucesso";
+    Integer status = 200;
+
+    return new ResponseMessageStatus(message,status);
+}
+```
+#### O método retorna ResponseMessageStatus e recebe por parâmetros,login do tipo String,e token do tipo String.
+#### 
+####
+####
+
 <br>
 
 --------------------------------------------------------------
-
+  
 ## Controllers
 
 
