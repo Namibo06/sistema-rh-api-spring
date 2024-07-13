@@ -506,9 +506,73 @@ public void deleteEnterpriseByIdService(Long id){
 }
 ```
 #### O método não possui retorno,tem um parâmetro,id do tipo Long.
-#### A variável existsEnterprise,é do tipo boolean,recebe o método existsEnterprise,passando como argumento id
-#### É verificado se o retorno existsEnterprise é false
-####
+#### A variável existsEnterprise,é do tipo boolean,recebe o método existsEnterprise,passando como argumento id.
+#### É verificado se o retorno existsEnterprise é false,e é lançada uma RuntimeException,com uma mensagem personalizada.
+#### É acessado o método deleteById() de enterpriseRepository,passando id como argumento.
+
+<br>
+
+#### • existsEnterprise
+```
+public boolean existsEnterprise(Long id){
+    boolean existEnterprise=enterpriseRepository.existsById(id);
+
+    if(!existEnterprise){
+        throw new EntityNotFoundException("ID da empresa não encontrado");
+    }
+    return true;
+}
+```
+#### O método retorna um boolean,e recebe um parâmetro,id do tipo Long.
+#### A variável existEnterprise,é do tipo boolean,e recebe o método existsById de enterpriseRepository,passando id como argumento.
+#### É verificado se o retorno de existEnterprise é false,se for,irá ser lançada uma EntityNotFoundException,com uma mensagem personalizada.
+#### Se passar pela condição,é retornado true.
+
+<br>
+
+#### • createUserLevelByEnterprise
+```
+public Long createUserLevelByEnterprise(Long enterpriseId){
+    UserLevel userLevel = new UserLevel();
+    userLevel.setId(null);
+    userLevel.setName("root");
+    userLevel.setEnterprise_id(enterpriseId);
+    UserLevel userLevelCreated=userLevelRepository.save(userLevel);
+
+    Long id=userLevelCreated.getId();
+    if (id == null){
+        throw new NullPointerException("ID nulo");
+    }
+    return id;
+}
+```
+#### O método é do tipo Long,e recebe um parâmetro,enterpriseId do tipo Long.  
+#### A variável userLevel é do tipo UserLevel,que recebe uma nova instância de UserLevel.É setado em userLevel alguns valores personalizados como argumentos.A variável userLevelCreated,é do tipo UserLevel,e recebe o método save() de userLevelRepository,passando como argumento userLevel. 
+#### A variável id,é do tipo Long,e recebe userLevelCreated,acessando o id,pelo método acessor get.
+#### É verificado se idé igual a nulo,se for,é lançada uma exceção NullPointerException com uma mensagem personalizada,caso passe pela condição,é retornado o id.
+
+<br>
+
+#### • createSectorByEnterprise
+```
+public Long createSectorByEnterprise(Long enterpriseId){
+    Sector sector = new Sector();
+    sector.setId(null);
+    sector.setName("root");
+    sector.setEnterprise_id(enterpriseId);
+    Sector sectorCreated=sectorRepository.save(sector);
+
+    Long id = sectorCreated.getId();
+    if(id == null){
+        throw new NullPointerException("ID nulo");
+    }
+    return id;
+}
+```
+#### O método é do tipo Long,e recebe um parâmetro,enterpriseId do tipo Long.
+#### A variável sector é do tipo Sector,que recebe uma nova instância de Sector.É setado em sector alguns valores personalizados como argumentos.A variável sectorCreated,é do tipo Sector,e recebe o método save() de sectorRepository,passando como argumento sector.
+#### A variável id,é do tipo Long,e recebe sectorCreated,acessando o id,pelo método acessor get.
+#### É verificado se idé igual a nulo,se for,é lançada uma exceção NullPointerException com uma mensagem personalizada,caso passe pela condição,é retornado o id.
 
 --------------------------------------------------------------
   
