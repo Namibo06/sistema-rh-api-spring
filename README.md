@@ -374,7 +374,84 @@ public boolean findEmployeeByLoginAndPassword(LoginResponseDTO credentials){
 
 ### ▪ EnterpriseService
 #### Depêndencias Injetadas:
-##### 
+##### enterpriseRepository - Acessa o repositório de Enterprise
+##### userLevelRepository - Acessa o repositório de UserLevel
+##### sectorRepository - Acessa o repositório de Sector
+##### employeeAddressRepository - Acessa o repositório de EmployeeAddress
+##### employeeService - Acessa a service de Employee
+##### modelMapper - Mapea dados
+
+#### • createEnterpriseService
+```
+public ResponseMessageStatus createEnterpriseService(EnterpriseDTO enterprise){
+    Enterprise enterpriseModel = new Enterprise();
+
+    enterpriseModel.setCnpj(enterprise.getCnpj());
+    if(enterpriseModel.getCnpj() == null || enterpriseModel.getCnpj().isEmpty()){
+        throw  new IllegalArgumentException("O campo de CNPJ não pode ser nulo ou vazio");
+    }
+    if(enterpriseModel.getCnpj().length() != 14){
+        throw new IllegalArgumentException("O campo de CNPJ precisa conter 14 caracteres");
+    }
+
+    enterpriseModel.setFantasy_name(enterprise.getFantasy_name());
+    enterpriseModel.setCompany_name(enterprise.getCompany_name());
+    enterpriseModel.setNumber_employees(enterprise.getNumber_employees());
+
+    Enterprise enterpriseCreated=enterpriseRepository.save(enterpriseModel);
+
+    Long idUserLevelDTO=createUserLevelByEnterprise(enterpriseCreated.getId());
+    Long idSectorDTO = createSectorByEnterprise(enterpriseCreated.getId());
+    String cepDefault = "44095400";
+
+    EmployeeDTO employeeDTO = new EmployeeDTO(
+            null,
+            "root",
+            null,
+            LocalDate.of(2003,10,06),
+            "others",
+            idSectorDTO,
+            cepDefault,
+            enterpriseCreated.getCnpj(),
+            idUserLevelDTO,
+            enterpriseCreated.getCnpj().concat("root"),
+            "123",
+            null);
+    employeeService.createEmployeeService(employeeDTO);
+
+    String message="Empresa criada com sucesso!";
+    Integer status = 201;
+
+    return new ResponseMessageStatus(
+            message,
+            status
+    );
+}
+```
+#### O método retorna o tipo ResponseMessageStatus,tem parâmetro,enterprise do tipo EnterpriseDTO
+#### A variável enterpriseModel do tipo Enterprise,recebe uma nova instância de Enterprise
+#### Seto em enterpriseModel o cnpj,como argumento recupero o cnpj de enterprise.É verificado abaixo se cnpj é vazio ou nulo,que aí é lançada uma exceção IllegalArgumentException com uma mensagem personalizada.É verificado logo abaixo também se o tamanho do cpj é diferente de 14,se for,,é lançada uma exceção IllegalArgumentException com uma mensagem personalizada.
+#### É setado em enterpriseModel,o fantasy name,passando como argumento fantasy name vindo de enterprise.É setado em enterpriseModel,a company name,passando como argumento company name vindo de enterprise.É setado em enterpriseModel,o number employees,passando como argumento number employees vindo de enterprise.A variável enterpriseCreated do tipo Enterprise,recebe o método save() do enterpriseRepository na qual passa como argumento enterpriseModel.
+#### A variável idUserLevelDTO é do tipo Long,recebe o método createUserLevelByEnterprise(),passando o id vindo de enterpriseCreated.A variável idSectorDTO é do tipo Long,recebe o método createSectorByEnterprise(),passando o id vindo de enterpriseCreated.A variável cepDefault é do tipo String e recebe um cep padrão.
+#### A variável employeeDTO,é do tipo EmployeeDTO,e recebe uma nova instâcia de EmployeeDTO acompanhado dos seguites parâmetros: id = null, firstame = "root", lastName = null, dateNasciment = LocalDate.of(2003,10,06), gender = "others", sector = idSectorDTO, cep = cepDefault, cnpjEnterprise = enterpriseCreated.getCnpj(), userLevel = idUserLevelDTO, login = enterpriseCreated.getCnpj().concat("root"), password = "123", token = null.Logo após acesso o método createEmployeeService() de employeeService passando employeeDTO como argumento.
+#### A variável message,é do tipo String,e recebe uma mensagem personalizada.A variável status,é do tipo Integer,e recebe um valor personalizado.O retorno é uma nova instância de ResponseMessageStatus,passando como argumentos,message e status. 
+
+<br>
+
+#### • findAllEnterprises
+```
+public Page<EnterpriseDTO> findAllEnterprises(Pageable pageable){
+    return enterpriseRepository
+            .findAll(pageable)
+            .map(enterprise ->
+                modelMapper.map(enterprise,EnterpriseDTO.class)
+            );
+}
+```
+#### O método retorna Page<EnterpriseDTO>,e recebe como parâmetro,pageable do tipo Pageable.
+#### O retorno é o método findAll() acesso por enterpriseRepository,passando como argumento pageable,acessando método map,passando como parâmetro enterprise e realizando um mapeamento de dados de enterprise para EnterpriseDTO.
+
+<br>
 
 --------------------------------------------------------------
   
