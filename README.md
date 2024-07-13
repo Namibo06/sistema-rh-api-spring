@@ -453,6 +453,63 @@ public Page<EnterpriseDTO> findAllEnterprises(Pageable pageable){
 
 <br>
 
+#### • findEnterpriseById
+```
+public EnterpriseDTO findEnterpriseById(Long id){
+    existsEnterprise(id);
+    Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada"));
+
+    return modelMapper.map(enterprise, EnterpriseDTO.class);
+}
+```
+#### O método retorna EnterpriseDTO,e recebe como parâmetro id do tipo Long.
+#### Acessa o método existsEnterprise() passando como argumento id,se voltar false,é lançada uma exceção,impedindo que siga os próximos passos do método findEnterpriseById().
+#### A variável enterprise,é do tipo Enterprise,recebe o método findById() da enterpriseRepository,logo após acessa o método orElseThrow() para evitar NullPointerException,ele lança uma exceção EntityNotFoundException com ma mensagem personalizada. 
+#### O retorno é atráves do método map() do model mapper,que mapea os dados de enterprise para EnterpriseDTO.
+
+<br>
+
+#### • updateEnterpriseByIdService
+```
+public ResponseMessageStatus updateEnterpriseByIdService(Long id,EnterpriseDTO enterpriseDTO){
+    existsEnterprise(id);
+    Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada"));
+
+    enterprise.setCnpj(enterpriseDTO.getCnpj());
+    enterprise.setFantasy_name(enterpriseDTO.getFantasy_name());
+    enterprise.setCompany_name(enterpriseDTO.getCompany_name());
+    enterprise.setNumber_employees(enterpriseDTO.getNumber_employees());
+    enterpriseRepository.save(enterprise);
+
+    String message = "Empresa atualizada com sucesso";
+    Integer status = 200;
+
+    return new ResponseMessageStatus(message,status);
+}
+```
+#### O método é do tipo ResponseMessageStatus,e recebe os parâmetros,id do tipo Long,e enterpriseDTO do tipo EnterpriseDTO.
+#### Acessa o método existsEnterprise() passando como argumento id,se voltar false,é lançada uma exceção,impedindo que siga os próximos passos do método findEnterpriseById().
+#### A variável enterprise,é do tipo Enterprise,recebe o método findById() da enterpriseRepository,logo após acessa o método orElseThrow() para evitar NullPointerException,ele lança uma exceção EntityNotFoundException com ma mensagem personalizada.
+#### É setado cnpj,fantasy name,company name,number employees em enterprise,passando por argumento os métodos acessores get vindo de enterpriseDTO.E no final acesso o método save() de enterpriseRepository,passando como argumento enterprise. 
+#### A variável message,é do tipo String,e recebe uma mensagem personalizada.A variável status,é do tipo Integer,e recebe um valor personalizado.O retorno é uma nova instância de ResponseMessageStatus,passando como argumentos,message e status.
+
+<br>
+
+#### • deleteEnterpriseByIdService
+```
+public void deleteEnterpriseByIdService(Long id){
+    boolean existsEnterprise=existsEnterprise(id);
+    if(!existsEnterprise){
+        throw new RuntimeException("Empresa não existe");
+    }
+    enterpriseRepository.deleteById(id);
+}
+```
+#### O método não possui retorno,tem um parâmetro,id do tipo Long.
+#### A variável existsEnterprise,é do tipo boolean,recebe o método existsEnterprise,passando como argumento id
+#### É verificado se o retorno existsEnterprise é false
+####
+
 --------------------------------------------------------------
   
 ## Controllers
