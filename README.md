@@ -328,15 +328,115 @@ public ResponseMessageStatus updateTokenByUser(String login, String token){
 }
 ```
 #### O método retorna ResponseMessageStatus e recebe por parâmetros,login do tipo String,e token do tipo String.
-#### 
-####
-####
+#### A variável employee é do tipo Optional<Employee> e recebe o método findByLogin() do repository,tendo como argumento o parâmetro login.É verificado se employee é vazio,se for é lançada uma exceção EntityNotFoundException com uma mensagem personalizada.
+#### A variável employeeModel,recebe employee,acessando seus atributos pelo método get().É verificado se o parâmetro token é vazio,se for,será lançada uma exceção IllegalArgumentException,com uma mensagem personalizada.
+#### A variável employeeModel,acessa o método setToken() e recebe token como argumento,abaixo é acessado o método save() de repository passando employeeModel como argumento.
+#### A variável message,é tipo String,e recebe uma mensagem personalizada,a variável status,é do tipo Integer e recebe um valor personalizado,e é retornado uma nova instância de ResponseMessageStatus,passando message e status como argumento.
 
 <br>
+
+#### • findByLogin
+```
+public EmployeeDTO findByLogin(String login){
+    Employee employee= repository.findByLogin(login).orElseThrow(()-> new EntityNotFoundException("Funcionário não encontrado"));
+    return modelMapper.map(employee, EmployeeDTO.class);
+}
+```
+#### O método retorna EmployeeDTO e recebe por parâmetro,login do tipo String.
+#### A variável employee é do tipo Employee,e recebe o método findByLogin() do repository,passando como argumento o parâmetro login,acessando o método orElseThrow para evitar NullPointerException,lançando uma nova instância de EntityNotFoundException com uma mensagem personalizada,caso seja preciso.
+#### O retorno é através de um mapeamento de dados,da variável employee,para a class EmployeeDTO.
+
+<br>
+
+#### • findEmployeeByLoginAndPassword
+```
+public boolean findEmployeeByLoginAndPassword(LoginResponseDTO credentials){
+    Optional<Employee> optionalEmployee = repository.findByLogin(credentials.login());
+
+    if (optionalEmployee.isPresent()) {
+        Employee employee = optionalEmployee.get();
+
+        boolean checkPassword = encoder.matches(credentials.password(), employee.getPassword());
+        if (!checkPassword) {
+            throw new BadCredentialsException("Senhas não batem");
+        }
+        return true;
+    }
+    return false;
+}
+```
+#### O método retorna boolean e recebe por parâmetro,credentials do tipo LoginResposeDTO.
+#### A variável optionalEmployee,é do tipo Optional<Employee>,e acessa o método findByLogin de repository,passando como argumento login que é acessado através de credentials.
+#### É verificado se optionalEmployee retorna um valor não nulo.A variável employee é do tipo Employee,e recebe o método get() de employeeEmployee recuperando seus dados,a variável checkPassword é do tipo boolean,recebe o método matches da dependêcia encoder,passando como argumento a password dentro de credentials e password dentro de employee que verifica se são iguais ou não.É verificado se checkPassword é false,se for é lançado uma nova exceção de BadCredentialsException com uma mensagem personalizada. 
+#### O retorno é true,se as senhas forem iguais,o retorno é false,se optionalEmployee for vazio
+
+<br>
+
+### ▪ EnterpriseService
+#### Depêndencias Injetadas:
+##### 
 
 --------------------------------------------------------------
   
 ## Controllers
+
+### ▪ LoginController - "/login" 
+##### Depêndencias Injetadas:
+###### service - Acessa o serviço do Login
+
+#### • login - POST
+```
+public ResponseEntity<ResponseMessageStatus> login(@RequestBody LoginResponseDTO credentials){
+    try {
+        boolean existsEmployee=service.findEmployeeByLoginAndPassword(credentials);
+        
+        if(!existsEmployee){
+            throw new EntityNotFoundException("Funcionário não encontrado");
+        }
+
+        String tokenCreated = service.createToken();
+
+        ResponseMessageStatus response = service.updateTokenByUser(credentials.login(),tokenCreated);
+        return ResponseEntity.ok(response);
+    }catch (Exception e){
+        String message=e.getMessage();
+        Integer status = 404;
+
+        ResponseMessageStatus response = new ResponseMessageStatus(message,status);
+        return ResponseEntity.ok(response);
+    }
+}
+```
+#### O método retorna ResponseEntity<ResponseMessageStatus> e recebe por parâmetro,credentials do tipo LoginResposeDTO pela anotação "@RequestBody".
+#### No bloco try,a variável existsEmployee,é do tipo boolean,,e recebe o método findEmployeeByLoginAndPassword() da service,passando como argumento credentials.É verificado se o retorno de existsEmployee for false,é lançada uma exceção EntityNotFoundException com uma mensagem personalizada
+#### A variável tokeCreated,é do tipo String,e retorna o método createToken() da service.A variável response do tipo ResponseMessageStatus,recebe o método updateTokenByUser() da service passando como parâmetro,o loginde credentials,e a variável tokenCreated que contém o token.Retorna o método ok() de ResponseEntity,passando como argumento a variável response. 
+#### No bloco catch que espera uma exceçãodo tipo Exception.
+#### A variável message,é do tipo String,e recebe uma mensagem personalizada,a variável status é do tipo Integer,e recebe um valor personalizado,a variável response é do tipo ResponseMessageStatus,e recebe uma nova instância de ResponseMessageStatu,passando como argumento message e status.
+#### O catch retorna o método ok() de ResponseEntity,passando como argumento a variável response.
+
+<br>
+
+#### • validateToken - "/token/{id}" - POST
+```
+public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id, @RequestBody TokenResponse tokenResponse){
+    ResponseMessageStatus response = service.verifyToken(id,tokenResponse.token());
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método retorna ResponseEntity<ResponseMessageStatus> e recebe por parâmetros,id do tipo Long vindo pela anotação "@PathVariable",tokenResponse do tipo TokenResponse pela anotação "@RequestBody". 
+#### A variável response,é do tipo ResponseMessageStatus,acessa o método verifyToken() da service,passando como argumento,o id,e o token pelo tokenResponse.
+#### O retorno é o método ok() de ResponseEntity,passando como argumento a variável response.   
+
+<br>
+
+### ▪ EnterpriseController - "/enterprise" 
+
+
+
+
+
+
 
 
 //No login será o seguinte:
