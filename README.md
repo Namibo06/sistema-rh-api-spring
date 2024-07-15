@@ -370,7 +370,7 @@ public boolean findEmployeeByLoginAndPassword(LoginResponseDTO credentials){
 #### É verificado se optionalEmployee retorna um valor não nulo.A variável employee é do tipo Employee,e recebe o método get() de employeeEmployee recuperando seus dados,a variável checkPassword é do tipo boolean,recebe o método matches da dependêcia encoder,passando como argumento a password dentro de credentials e password dentro de employee que verifica se são iguais ou não.É verificado se checkPassword é false,se for é lançado uma nova exceção de BadCredentialsException com uma mensagem personalizada. 
 #### O retorno é true,se as senhas forem iguais,o retorno é false,se optionalEmployee for vazio
 
-<br>
+<br><br>
 
 ### ▪ EnterpriseService
 #### Depêndencias Injetadas:
@@ -574,13 +574,26 @@ public Long createSectorByEnterprise(Long enterpriseId){
 #### A variável id,é do tipo Long,e recebe sectorCreated,acessando o id,pelo método acessor get.
 #### É verificado se idé igual a nulo,se for,é lançada uma exceção NullPointerException com uma mensagem personalizada,caso passe pela condição,é retornado o id.
 
+<br><br>
+
+### ▪ UserLevelService
+#### Depêndencias Injetadas:
+##### enterpriseRepository - Acessa o repositório de Enterprise
+##### userLevelRepository - Acessa o repositório de UserLevel
+##### sectorRepository - Acessa o repositório de Sector
+##### employeeAddressRepository - Acessa o repositório de EmployeeAddress
+##### employeeService - Acessa a service de Employee
+##### modelMapper - Mapea dados
+
 --------------------------------------------------------------
   
 ## Controllers
 
 ### ▪ LoginController - "/login" 
-##### Depêndencias Injetadas:
-###### service - Acessa o serviço do Login
+#### Depêndencias Injetadas:
+##### service - Acessa o serviço do Login
+
+<br>
 
 #### • login - POST
 ```
@@ -626,12 +639,88 @@ public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id
 #### A variável response,é do tipo ResponseMessageStatus,acessa o método verifyToken() da service,passando como argumento,o id,e o token pelo tokenResponse.
 #### O retorno é o método ok() de ResponseEntity,passando como argumento a variável response.   
 
-<br>
+<br><br>
 
 ### ▪ EnterpriseController - "/enterprise" 
+#### Depêndencias Injetadas:
+##### enterpriseService - Acessa o serviço da Enterprise
 
+<br>
 
+#### • createEnterprise - POST
+```
+public ResponseEntity<ResponseMessageStatus> createEnterprise(@RequestBody EnterpriseDTO enterprise, UriComponentsBuilder uriBuilder){
+    ResponseMessageStatus enterpriseDTO=enterpriseService.createEnterpriseService(enterprise);
+    URI path = uriBuilder.path("/enterprises/{id}").buildAndExpand(enterprise.getId()).toUri();
 
+    return ResponseEntity.created(path).body(enterpriseDTO);
+}
+```
+#### O método retorna ResponseEntity<ResponseMessageStatus>,recebe como parâmetros enterprise do tipo EnterpriseDTO pela anotação "RequestBody",e uriBuilder do tipo UriComponentsBuilder.
+#### A variável enterpriseDTOdo,é do tipo ResponseMessageStatus,acessa o método createEnterpriseService() de enterpriseService,passando como argumento enterprise.
+#### A variável path,é do tipo URI,e acessa o método path() de uriBuilder,passando como argumento o caminho até o id,acessa o método buildAndExpand,passando como argumento o id que é recuperado de enterprise,e acessa por fim o método toUri(). 
+#### Retorna o método created() de ResponseEntity,passando como argumento a variável path,acessa o método body() passando como argumento a variável enterpriseDTO. 
+
+<br>
+
+#### • getAllEnterprises - GET
+```
+public ResponseEntity<Page<EnterpriseDTO>> getAllEnterprises(@PageableDefault(size = 15)Pageable pageable){
+    Page<EnterpriseDTO> enterprises=enterpriseService.findAllEnterprises(pageable);
+
+    return ResponseEntity.ok(enterprises);
+}
+```
+#### O método é do tipo ResponseEntity<Page<EnterpriseDTO>>,e tem como parâmetro,a anotação "PageableDefault" passando que o tamanho é até 15,e pageable do tipo Pageable.
+#### A variável enterprises,do tipo Page<EnterpriseDTO>,que acessa o método findAllEnterprises() de enterpriseService,passando como argumento pageable. 
+#### Retornao método ok() de ResponseEntity,passando coo argumento enterprises. 
+
+<br>
+
+#### • getEnterpriseById - "/{id}" - GET
+```
+public ResponseEntity<EnterpriseDTO> getEnterpriseById(@PathVariable Long id){
+    EnterpriseDTO enterpriseDTO = enterpriseService.findEnterpriseById(id);
+    return ResponseEntity.ok(enterpriseDTO);
+}
+```
+#### O método é do tipo ResponseEntity<EnterpriseDTO>,e tem como parâmetro id do tipo Long que vem através da anotação "PathVariable".
+#### A variável enterpriseDTO do tipo EnterpriseDTO,acessa o método findEnterpriseById() de enterpriseDTO,passando id como argumento.
+#### Retorna o método ok() de ResponseEntity,passando como argumento enterpriseDTO.
+
+<br>
+
+#### • getEnterpriseById - "/{id}" - PUT
+```
+public ResponseEntity<ResponseMessageStatus> updateEnterpriseById(@PathVariable Long id,@RequestBody EnterpriseDTO enterpriseDTO){
+    ResponseMessageStatus response = enterpriseService.updateEnterpriseByIdService(id,enterpriseDTO);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<ResponseMessageStatus>,e tem como parâmetros,id do tipo Long recebido da anotação "PathVariable",e enterpriseDTO do tipo EnterpriseDTO vindo da anotação "RequestBody". 
+#### A variável response,é do tipo ResponseMessageStatus,e recebe updateEnterpriseByIdService() vindo de enterpriseService,passando como argumentos,id e enterpriseDTO.
+#### Retorna o método ok() de ResponseEntity,passando response como argumento.
+
+<br>
+
+#### • deleteEnterpriseById - "/{id}" - DELETE
+```
+public ResponseEntity<Void> deleteEnterpriseById(@PathVariable Long id){
+    enterpriseService.deleteEnterpriseByIdService(id);
+
+    return ResponseEntity.noContent().build();
+}
+```
+#### O método é do tipo ResponseEntity<Void>,e recebe como parâmetro id do tipo Long recuperado pela anotação "PathVariable".
+#### Acessa o método deleteEnterpriseByIdService de enterpriseService,passando como argumento o id.
+#### Retorna o método noCotent() de ResponseEity,e logo depois acessa o método build().
+
+<br><br>
+
+### ▪ UserLevelController - "/user_level"
+#### Depêndencias Injetadas:
+##### service - Acessa o serviço de UserLevel
 
 
 
