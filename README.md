@@ -914,10 +914,29 @@ public ResponseMessageStatus verifyAddressService(String cep) {
 #### Se existsAddress retornar false,a variável cep,recebe o método replaceAll de cep,passando que tudo que não for números de 0 a 9,será removido.A variável url é do tipo String,e recebe a url da API da ViaCep passando o cep para consulta.
 #### No bloco try,a variável response é do tipo ResponseEntity<Map<String, String>>,acessa o método exchange() de restTemplate,passando como parâmetros,url (a url que será enviada a requisição),HttpMethod.GET (é o tipo do método da requisição),null (a entidade da requisição,é null,porqê o método GET não possui corpo da requisição),new ParameterizedTypeReference<Map<String, String>>() {} (ParameterizedTypeReference é um classe usada para lidar com tipos genéricos,é utilizado para informar ao RestTemplate o tipo exato da resposta esperada).
 #### É verificado se o status de response é igual ao método OK de HttpStatus.A variável responseBody é do tipo Map<String, String>,e recebe o método getBody() de response,para recuperar o corpo da resposta da chamadaa API da  ViaCep.
-#### É verificado se responseBody é diferente de null e se é diferente de vazio,passando nessa condição temavariável address do tipo EmployeeAddress,que recebe uma nova instância de EmployeeAddress,logo após é setado os valores no cep,uf,city,neighborhood e road,depois é acessado o método save() de repository,passando como argumento address.Após isso
-####
-####
+#### É verificado se responseBody é diferente de null e se é diferente de vazio,passando nessa condição temavariável address do tipo EmployeeAddress,que recebe uma nova instância de EmployeeAddress,logo após é setado os valores no cep,uf,city,neighborhood e road,depois é acessado o método save() de repository,passando como argumento address.Após isso tem duas variáveis uma é MESSAGE_SUCCESS_CREATED,do tipo String com uma mensagem personalizada,e a outra STATUS_SUCCESS_CREATED,do tipo Integer com um valor personalizado,é retornado uma nova instância de ResponseMessageStatus,passando como argumentos MESSAGE_SUCCESS_CREATED e STATUS_SUCCESS_CREATED. 
+#### No bloco catch,caso seja capturado uma Exception,será lançada a exceção RuntimeException com uma mensagem personalizada,junto com a mensagem de erro captturada pela variável e,sendo recuperado pelo método getMessage().
+#### Ainda dentro do else,caso não caia nem no try e nem no catch,tem a variável MESSAGE_FAILED do tipo String com uma mensagem personalizada,e STATUS_FAILED do tipo Integer com um valor personalizado,que por fim retorna uma nova instância de ResponseMessageStatus,passando por argumentos,MESSAGE_FAILED e STATUS_FAILED. 
 
+<br>
+
+#### • existAddress
+```
+public boolean existAddress(String cep){
+    cep = cep.replaceAll("[^0-9]","");
+    Long result = repository.existsByCep(cep);
+
+    if(result != 0){
+        return true;
+    }else{
+        return false;
+    }
+}
+```
+#### O método é do tipo boolean,e recebe como parâmetro cep do tipo String.
+#### A variável cep,recebe o método replaceAll de cep,para permitir que somente haja números de 0 a 9,se tiver símbolos ou letras serão removidos.
+#### A variável result é do tipo Long,acessa o método existsByCep de repository,passando como argumento cep.
+#### É verificado se resul é diferente de 0,se for retorna true,senão retorna false.
 
 
 --------------------------------------------------------------
