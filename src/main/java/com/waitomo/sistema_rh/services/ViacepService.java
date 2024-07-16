@@ -28,20 +28,13 @@ public class ViacepService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String MESSAGE_SUCCESS_OK = "Cep localizado e inserido com sucesso!";
-    private final String MESSAGE_SUCCESS_CREATED = "Cep criado e inserido com sucesso!";
-    private final String MESSAGE_FAILED = "Houve alguma falha ao tentar consular o serviço da ViaCep";
-    private final Integer STATUS_SUCCESS_OK = 200;
-    private final Integer STATUS_SUCCESS_CREATED = 200;
-    private final Integer STATUS_FAILED = 400;
-
     public ResponseMessageStatus verifyAddressService(String cep) {
         boolean existsAddress = existAddress(cep);
 
         if (existsAddress) {
-            //EmployeeAddress employeeAddress = repository.findAddressByCep(cep);
-
-            return new ResponseMessageStatus(MESSAGE_SUCCESS_OK,STATUS_SUCCESS_OK);
+            String MESSAGE_SUCCESS_OK = "Cep localizado e inserido com sucesso!";
+            Integer STATUS_SUCCESS_OK = 200;
+            return new ResponseMessageStatus(MESSAGE_SUCCESS_OK, STATUS_SUCCESS_OK);
 
         } else {
             System.out.println("Endereço não existe\n");
@@ -63,13 +56,17 @@ public class ViacepService {
                         address.setRoad(responseBody.get("logradouro"));
                         repository.save(address);
 
-                        return new ResponseMessageStatus(MESSAGE_SUCCESS_CREATED,STATUS_SUCCESS_CREATED);
+                        String MESSAGE_SUCCESS_CREATED = "Cep criado e inserido com sucesso!";
+                        Integer STATUS_SUCCESS_CREATED = 200;
+                        return new ResponseMessageStatus(MESSAGE_SUCCESS_CREATED, STATUS_SUCCESS_CREATED);
                     }
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Erro ao consultar serviço ViaCEP: " + e.getMessage());
             }
-            return new ResponseMessageStatus(MESSAGE_FAILED,STATUS_FAILED);
+            String MESSAGE_FAILED = "Houve alguma falha ao tentar consular o serviço da ViaCep";
+            Integer STATUS_FAILED = 400;
+            return new ResponseMessageStatus(MESSAGE_FAILED, STATUS_FAILED);
         }
     }
 
