@@ -578,12 +578,347 @@ public Long createSectorByEnterprise(Long enterpriseId){
 
 ### ▪ UserLevelService
 #### Depêndencias Injetadas:
-##### enterpriseRepository - Acessa o repositório de Enterprise
-##### userLevelRepository - Acessa o repositório de UserLevel
-##### sectorRepository - Acessa o repositório de Sector
-##### employeeAddressRepository - Acessa o repositório de EmployeeAddress
-##### employeeService - Acessa a service de Employee
+##### repository - Acessa o repositório de UserLevel
+##### enterpriseRepository - Acessao repositório de Enterprise
 ##### modelMapper - Mapea dados
+
+#### • createUserLevelService
+```
+public ResponseMessageStatus createUserLevelService(UserLevelDTO userLevel){
+    UserLevel userLevelModel = modelMapper.map(userLevel, UserLevel.class);
+    userLevelModel.setName(userLevel.getName());
+    if(!existEnterpriseId(userLevel.getEnterprise_id())){
+        throw new EntityNotFoundException("ID da empresa não encontrado");
+    }
+
+    userLevelModel.setEnterprise_id(userLevel.getEnterprise_id());
+    repository.save(userLevelModel);
+
+    String message = "Nível de usuário criado com sucesso";
+    Integer status = 201;
+
+    return new ResponseMessageStatus(message,status);
+}
+```
+#### O método é do tipo ResponseMessageStatus,e recebe como parâmetro,userLevel do tipo UserLevelDTO.
+#### A variável userLevelModel,é do tipo UserLevel,recebe um mapeamento através do método map() que passa userLevel que é um DTO,para a entidade UserLevel.Logo após seto o name em userLevelModel,que passa por argumento 
+#### É verificado se o método existEnterpriseId() que passa o enterpriseId vindo ded userLevel como argumento,retorna false,se retornar false lança uma exceção EntityNotFoundException com uma mensagem personalizada.
+#### Se passar da condição,é setado o enterpriseId na variável userLevelModel,e por fim acessado o método save() de repository,passando como a argumento userLevelModel.
+#### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status é do tipo Integer,e recebe um valor personalizado.Por fim retorna uma nova instância de ResponseMessageStatus,passando como argumentos message e status.
+
+<br>
+
+#### • getAllUserLevelService
+```
+public Page<UserLevelDTO> getAllUserLevelService(Pageable pageable){
+    return repository
+            .findAll(pageable)
+            .map(userLevel -> modelMapper.map(userLevel, UserLevelDTO.class));
+}
+```
+#### O método retorna Page<UserLevelDTO>,e recebe como parâmetro,pageable que é do tipo Pageable.
+#### Retorna o método findAll() vindo de repository,que passa por argumento pageable,e acessa o método map(),passando por parâmetro userLevel,que realiza o mapeamento de userLevel para UserLevelDTO.
+
+<br>
+
+#### • getUserLevelByIdService
+```
+public UserLevelDTO getUserLevelByIdService(Long id){
+    existsUserLevel(id);
+
+    UserLevel userLevel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nível de Usuário nnão encontrado"));
+    return modelMapper.map(userLevel, UserLevelDTO.class);
+}
+```
+#### O método retorna UserLevelDTO,e recebe como parâmetro id do tipo Long.
+#### Acessa o método existsUserLevel() que passa id como argumento.
+#### A variável userLevel é do tipo UserLevel,e acessa o método findById() vindo de repository,passa como argumento o id,e acessa o método orElseThrow(),lançando uma exceção EntityNotFoundException com uma mensagem personalizada caso não ache o id do userLevel.   
+#### Retorna um mapeamento através do método map() de userLevel para UserLevelDTO.
+
+<br>
+
+#### • updateUserLevelByIdService
+```
+public ResponseMessageStatus updateUserLevelByIdService(Long id,UserLevelDTO userLevelDTO){
+    existsUserLevel(id);
+
+    UserLevel userLevel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nível de Usuário não encontrado"));
+    userLevel.setName(userLevelDTO.getName());
+    userLevel.setEnterprise_id(userLevelDTO.getEnterprise_id());
+    repository.save(userLevel);
+
+    String message = "Nível de usuário atualizado com sucesso";
+    Integer status = 200;
+    return new ResponseMessageStatus(message,status);
+}
+```
+#### O método é do tipo ResponseMessageStatus,e recebe por parâmetros,id do tipo Long,e userLevelDTO do tipo UserLevelDTO.
+#### Acessa o método existsUserLevel() passando id como argumento.
+#### A variável userLevel,é do tipo UserLevel,e recebe o método findById() de repository,passando id como argumento,acessando o método orElseThrow() que lançará uma nova exceção EntityNotFoundException com uma mensagem personalizada.
+#### É setado em userLevel,name e enterpriseId vindos de userLevelDTO.Acessa o método save() de repository,passando como argumento userLevel.
+#### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status é do tipo Integer,e recebe um valor personalizado.Por fim retorna uma nova instância de ResponseMessageStatus,passando como argumentos message e status.
+
+<br>
+
+#### • deleteUserLevelByIdService
+```
+public void deleteUserLevelByIdService(Long id){
+    existsUserLevel(id);
+
+    repository.deleteById(id);
+}
+```
+#### O método não tem retorno,e recebe o parâmetro id que é do tipo Long.
+#### Acessa o método existsUserLevel(),passando como argumento id.
+#### Acessa o método deleteById() de repository,passando como argumento id.
+
+<br>
+
+#### • existsUserLevel
+```
+public void existsUserLevel(Long id){
+    boolean existsUserLevelById = repository.existsById(id);
+
+    if(!existsUserLevelById){
+        throw new EntityNotFoundException("Nível de Usuário não encontrado");
+    }
+}
+```
+#### O método não tem retorno,e recebe o parâmetro id que é do tipo Long.
+#### A variável existsUserLevelById é do tipo boolean,que acessa existsById() de repository,passando id como argumento. 
+#### É verificado se o retorno de existsUserLevelById é false,se for,é lançado uma nova exceção EntityNotFoundException com uma mensagem persoalizada.
+
+<br>
+
+#### • existEnterpriseId
+```
+public boolean existEnterpriseId(Long id){
+    return enterpriseRepository.existsById(id);
+}
+```
+#### O método é do tipo boolean,e recebe o parâmetro id que é do tipo Long.
+#### Retorna existsById() de enterpriseRepository,passando id como argumento.
+
+<br><br>
+
+### ▪ SectorService
+#### Depêndencias Injetadas:
+##### repository - Acessa o repositório de Sector
+##### enterpriseRepository - Acessao repositório de Enterprise
+##### modelMapper - Mapea dados
+
+#### • createSector
+```
+public ResponseMessageStatus createSector(SectorDTO sectorDTO){
+    final String MESSAGE_SUCCESS="Setor criado com sucesso";
+    final Integer STATUS_SUCCESS=200;
+    final String MESSAGE_FAILED="Este setor já existe";
+    final Integer STATUS_FAILED=409;
+    final String MESSAGE_BAD="ID da Empresa não encontrado";
+    final Integer STATUS_BAD=404;
+
+    if(!existEnterpriseId(sectorDTO.getEnterprise_id())){
+        return new ResponseMessageStatus(
+                MESSAGE_BAD,
+                STATUS_BAD
+        );
+    }
+
+    boolean existSectorName=existSector(sectorDTO.getName(),sectorDTO.getEnterprise_id());
+
+    if(existSectorName){
+        return new ResponseMessageStatus(
+                MESSAGE_FAILED,
+                STATUS_FAILED
+        );
+    }else{
+        Sector sectorModel = modelMapper.map(sectorDTO, Sector.class);
+        sectorModel.setName(sectorDTO.getName());
+        sectorModel.setEnterprise_id(sectorDTO.getEnterprise_id());
+        repository.save(sectorModel);
+
+        return new ResponseMessageStatus(
+                MESSAGE_SUCCESS,
+                STATUS_SUCCESS
+        );
+    }
+}
+```
+#### O método é do tipo ResponseMessageStatus,e tem como parâmetro,sectorDTO que é do tipo SectorDTO.
+#### É setado seis constantes,dentre elas message e status personalizados.
+#### É verificado se o método existEnterpriseId(),que passa enterpriseId vindo de sectorDTO,retorna false,se for,retorna uma nova instância de ResponseMessageStatus,passando como argumentos,MESSAGE_BAD e STATUS_BAD.
+#### A variável existSectorName,é do tipo boolean,e recebe o método existSector(),que passa como argumentos,name e enterpriseId vindos de sectorDTO.
+#### É verificado se o método existSectorName(),retorna true,se for,retorna uma nova instância de ResponseMessageStatus,passando como argumentos,MESSAGE_FAILED e STATUS_FAILED.
+#### Senão a variável sectorModel do tipo Sector,acessa o método map() para fazer o mapeamento de sectorDTO para Sector.É setado para sectorModel name e enterpriseId vindos de sectorDTO,logo após é acessado o método save() de repository,passando como argumento sectorModel,e retorna uma nova instância de ResponseMessageStatus,passando como argumentos,MESSAGE_SUCCESS e STATUS_SUCCESS. 
+
+<br>
+
+#### • getAllSectorService
+```
+public Page<SectorDTO> getAllSectorService(Pageable pageable){
+    return repository
+            .findAll(pageable)
+            .map(sector -> modelMapper.map(sector, SectorDTO.class));
+}
+```
+#### O método retorna Page<SectorDTO>,e recebe como parâmetro,pageable que é do tipo Pageable.
+#### Retorna o método findAll() vindo de repository,que passa por argumento pageable,e acessa o método map(),passando por parâmetro sector,que realiza o mapeamento de sector para SectorDTO.
+
+<br>
+
+#### • getSectorByIdService
+```
+public SectorDTO getSectorByIdService(Long id){
+    existsSectorById(id);
+
+    Sector sector = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Setor não encontrado"));
+    return modelMapper.map(sector, SectorDTO.class);
+}
+```
+#### O método retorna SectorDTO,e recebe como parâmetro id do tipo Long.
+#### Acessa o método existsSectorById() que passa id como argumento.
+#### A variável sector é do tipo Sector,e acessa o método findById() vindo de repository,passa como argumento o id,e acessa o método orElseThrow(),lançando uma exceção EntityNotFoundException com uma mensagem personalizada caso não ache o id do Sector.
+#### Retorna um mapeamento através do método map() de sector para SectorDTO.
+
+<br>
+
+#### • updateSectorByIdService
+```
+public ResponseMessageStatus updateSectorByIdService(Long id,SectorDTO sectorDTO){
+    existsSectorById(id);
+
+    Sector sector = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Setor não encontrado"));
+    sector.setName(sectorDTO.getName());
+    sector.setEnterprise_id(sectorDTO.getEnterprise_id());
+    repository.save(sector);
+
+    String message = "Setor atualizado com sucesso";
+    Integer status = 200;
+    return new ResponseMessageStatus(message,status);
+}
+```
+#### O método é do tipo ResponseMessageStatus,e recebe por parâmetros,id do tipo Long,e sectorDTO do tipo SectorDTO.
+#### Acessa o método existsSectorById() passando id como argumento.
+#### A variável sector,é do tipo Sector,e recebe o método findById() de repository,passando id como argumento,acessando o método orElseThrow() que lançará uma nova exceção EntityNotFoundException com uma mensagem personalizada.
+#### É setado em sector,name e enterpriseId vindos de sectorDTO.Acessa o método save() de repository,passando como argumento sector.
+#### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status é do tipo Integer,e recebe um valor personalizado.Por fim retorna uma nova instância de ResponseMessageStatus,passando como argumentos message e status.
+
+<br>
+
+#### • deleteSectorByIdService
+```
+public void deleteSectorByIdService(Long id){
+    existsSectorById(id);
+
+    repository.deleteById(id);
+}
+```
+#### O método não tem retorno,e recebe o parâmetro id que é do tipo Long.
+#### Acessa o método existsSectorById(),passando como argumento id.
+#### Acessa o método deleteById() de repository,passando como argumento id.
+
+<br>
+
+#### • existSector
+```
+public boolean existSector(String name,Long enterprise_id){
+    Long existSector = repository.existsByNameAndEntepriseId(name,enterprise_id);
+
+    return existSector != 0;
+}
+```
+#### O método é do tipo boolean,e recebe como parâmetros,name dotipoString,e enterprise_id do tipo Long.
+#### A variável existSector é do tipo Long,e recebe o método existsByNameAndEntepriseId() de repository,passando como argumentos,name e enterprise_id.
+#### Retorna true quando existSector for diferente de 0.
+
+<br>
+
+#### • existsSectorById
+```
+public void existsSectorById(Long id){
+    boolean existsSector = repository.existsById(id);
+
+    if(!existsSector){
+        throw new EntityNotFoundException("Setor não encontrado");
+    }
+}
+```
+#### O método não tem retorno,e recebe o parâmetro id que é do tipo Long.
+#### A variável existsSector é do tipo boolean,que acessa existsById() de repository,passando id como argumento.
+#### É verificado se o retorno de existsSector é false,se for,é lançado uma nova exceção EntityNotFoundException com uma mensagem persoalizada.
+
+<br>
+
+#### • existEnterpriseId
+```
+public boolean existEnterpriseId(Long id){
+    return enterpriseRepository.existsById(id);
+}
+```
+#### O método é do tipo boolean,e recebe o parâmetro id que é do tipo Long.
+#### Retorna existsById() de enterpriseRepository,passando id como argumento.
+
+<br><br>
+
+### ▪ ViacepService
+#### Depêndencias Injetadas:
+##### repository - Acessa o repositório de EmployeeAddress
+##### restTemplate - Responsável por fazer chamadas HTTP síncronas e diretas,serve para se comunicar com outros serviços
+##### modelMapper - Mapea dados
+
+#### • verifyAddressService
+```
+public ResponseMessageStatus verifyAddressService(String cep) {
+    boolean existsAddress = existAddress(cep);
+
+    if (existsAddress) {
+        String MESSAGE_SUCCESS_OK = "Cep localizado e inserido com sucesso!";
+        Integer STATUS_SUCCESS_OK = 200;
+        return new ResponseMessageStatus(MESSAGE_SUCCESS_OK, STATUS_SUCCESS_OK);
+
+    } else {
+        cep = cep.replaceAll("[^0-9]", "");
+        String url = "https://viacep.com.br/ws/"+cep+"/json";
+
+        try {
+            ResponseEntity<Map<String, String>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, String>>() {});
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                Map<String, String> responseBody = response.getBody();
+                if (responseBody != null && !responseBody.isEmpty()) {
+                    EmployeeAddress address = new EmployeeAddress();
+                    address.setCep(cep);
+                    address.setUf(responseBody.get("uf"));
+                    address.setCity(responseBody.get("localidade"));
+                    address.setNeighborhood(responseBody.get("bairro"));
+                    address.setRoad(responseBody.get("logradouro"));
+                    repository.save(address);
+
+                    String MESSAGE_SUCCESS_CREATED = "Cep criado e inserido com sucesso!";
+                    Integer STATUS_SUCCESS_CREATED = 200;
+                    return new ResponseMessageStatus(MESSAGE_SUCCESS_CREATED, STATUS_SUCCESS_CREATED);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao consultar serviço ViaCEP: " + e.getMessage());
+        }
+        String MESSAGE_FAILED = "Houve alguma falha ao tentar consular o serviço da ViaCep";
+        Integer STATUS_FAILED = 400;
+        return new ResponseMessageStatus(MESSAGE_FAILED, STATUS_FAILED);
+    }
+}
+```
+#### O método é do tipo ResponseMessageStatus,e recebe como parâmetro,cep do tipo String.
+#### A variável existsAddress é do tipo boolean,que acessa o método existAddress(),que passa como argmento cep.
+#### Se existsAddress retornar true,detém duas variáveis para um retorno de sucesso com valores personalizados,sendo um MESSAGE_SUCCESS_OK do tipo String,e outro STATUS_SUCCESS_OK do tipo Integer,e o retorno é uma nova instância de ResponseMessageStatus,passando MESSAGE_SUCCESS_OK e STATUS_SUCCESS_OK como argumentos.   
+#### Se existsAddress retornar false,a variável cep,recebe o método replaceAll de cep,passando que tudo que não for números de 0 a 9,será removido.A variável url é do tipo String,e recebe a url da API da ViaCep passando o cep para consulta.
+#### No bloco try,a variável response é do tipo ResponseEntity<Map<String, String>>,acessa o método exchange() de restTemplate,passando como parâmetros,url (a url que será enviada a requisição),HttpMethod.GET (é o tipo do método da requisição),null (a entidade da requisição,é null,porqê o método GET não possui corpo da requisição),new ParameterizedTypeReference<Map<String, String>>() {} (ParameterizedTypeReference é um classe usada para lidar com tipos genéricos,é utilizado para informar ao RestTemplate o tipo exato da resposta esperada).
+#### É verificado se o status de response é igual ao método OK de HttpStatus.A variável responseBody é do tipo Map<String, String>,e recebe o método getBody() de response,para recuperar o corpo da resposta da chamadaa API da  ViaCep.
+#### É verificado se responseBody é diferente de null e se é diferente de vazio,passando nessa condição temavariável address do tipo EmployeeAddress,que recebe uma nova instância de EmployeeAddress,logo após é setado os valores no cep,uf,city,neighborhood e road,depois é acessado o método save() de repository,passando como argumento address.Após isso
+####
+####
+
+
 
 --------------------------------------------------------------
   
@@ -645,8 +980,6 @@ public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id
 #### Depêndencias Injetadas:
 ##### enterpriseService - Acessa o serviço da Enterprise
 
-<br>
-
 #### • createEnterprise - POST
 ```
 public ResponseEntity<ResponseMessageStatus> createEnterprise(@RequestBody EnterpriseDTO enterprise, UriComponentsBuilder uriBuilder){
@@ -657,7 +990,7 @@ public ResponseEntity<ResponseMessageStatus> createEnterprise(@RequestBody Enter
 }
 ```
 #### O método retorna ResponseEntity<ResponseMessageStatus>,recebe como parâmetros enterprise do tipo EnterpriseDTO pela anotação "RequestBody",e uriBuilder do tipo UriComponentsBuilder.
-#### A variável enterpriseDTOdo,é do tipo ResponseMessageStatus,acessa o método createEnterpriseService() de enterpriseService,passando como argumento enterprise.
+#### A variável enterpriseDTO,é do tipo ResponseMessageStatus,acessa o método createEnterpriseService() de enterpriseService,passando como argumento enterprise.
 #### A variável path,é do tipo URI,e acessa o método path() de uriBuilder,passando como argumento o caminho até o id,acessa o método buildAndExpand,passando como argumento o id que é recuperado de enterprise,e acessa por fim o método toUri(). 
 #### Retorna o método created() de ResponseEntity,passando como argumento a variável path,acessa o método body() passando como argumento a variável enterpriseDTO. 
 
@@ -673,7 +1006,7 @@ public ResponseEntity<Page<EnterpriseDTO>> getAllEnterprises(@PageableDefault(si
 ```
 #### O método é do tipo ResponseEntity<Page<EnterpriseDTO>>,e tem como parâmetro,a anotação "PageableDefault" passando que o tamanho é até 15,e pageable do tipo Pageable.
 #### A variável enterprises,do tipo Page<EnterpriseDTO>,que acessa o método findAllEnterprises() de enterpriseService,passando como argumento pageable. 
-#### Retornao método ok() de ResponseEntity,passando coo argumento enterprises. 
+#### Retorna o método ok() de ResponseEntity,passando como argumento enterprises. 
 
 <br>
 
@@ -685,7 +1018,7 @@ public ResponseEntity<EnterpriseDTO> getEnterpriseById(@PathVariable Long id){
 }
 ```
 #### O método é do tipo ResponseEntity<EnterpriseDTO>,e tem como parâmetro id do tipo Long que vem através da anotação "PathVariable".
-#### A variável enterpriseDTO do tipo EnterpriseDTO,acessa o método findEnterpriseById() de enterpriseDTO,passando id como argumento.
+#### A variável enterpriseDTO do tipo EnterpriseDTO,acessa o método findEnterpriseById() de enterpriseService,passando id como argumento.
 #### Retorna o método ok() de ResponseEntity,passando como argumento enterpriseDTO.
 
 <br>
@@ -722,6 +1055,172 @@ public ResponseEntity<Void> deleteEnterpriseById(@PathVariable Long id){
 #### Depêndencias Injetadas:
 ##### service - Acessa o serviço de UserLevel
 
+#### • createUserLevel - POST
+```
+public ResponseEntity<ResponseMessageStatus> createUserLevel(@RequestBody UserLevelDTO userLevel, UriComponentsBuilder uriBuilder){
+    ResponseMessageStatus response = service.createUserLevelService(userLevel);
+    URI path = uriBuilder.path("user_level/{id}").buildAndExpand(userLevel.getId()).toUri();
+
+    return ResponseEntity.created(path).body(response);
+}
+```
+#### O método retorna ResponseEntity<ResponseMessageStatus>,recebe como parâmetros userLevel do tipo UserLevelDTO pela anotação "RequestBody",e uriBuilder do tipo UriComponentsBuilder.
+#### A variável response,é do tipo ResponseMessageStatus,acessa o método createUserLevelService() de service,passando como argumento userLevel.
+#### A variável path,é do tipo URI,e acessa o método path() de uriBuilder,passando como argumento o caminho até o id,acessa o método buildAndExpand,passando como argumento o id que é recuperado de userLevel,e acessa por fim o método toUri().
+#### Retorna o método created() de ResponseEntity,passando como argumento a variável path,acessa o método body() passando como argumento a variável response.
+
+<br>
+
+#### • getAllUserLevel - GET
+```
+public ResponseEntity<Page<UserLevelDTO>> getAllUserLevel(@PageableDefault(size = 15) Pageable pageable){
+    Page<UserLevelDTO> response = service.getAllUserLevelService(pageable);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<Page<UserLevelDTO>>,e tem como parâmetro,a anotação "PageableDefault" passando que o tamanho é até 15,e pageable do tipo Pageable.
+#### A variável response,do tipo Page<UserLevelDTO>,que acessa o método getAllUserLevelService() de service,passando como argumento pageable.
+#### Retorna o método ok() de ResponseEntity,passando como argumento response.
+
+<br>
+
+#### • getUserLevelById - "/{id}" - GET
+```
+public ResponseEntity<UserLevelDTO> getUserLevelById(@PathVariable Long id){
+    UserLevelDTO response = service.getUserLevelByIdService(id);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<UserLevelDTO>,e tem como parâmetro id do tipo Long que vem através da anotação "PathVariable".
+#### A variável response do tipo UserLevelDTO,acessa o método getUserLevelByIdService() de service,passando id como argumento.
+#### Retorna o método ok() de ResponseEntity,passando como argumento response.
+
+<br>
+
+#### • updateUserLevelById - "/{id}" - PUT
+```
+public ResponseEntity<ResponseMessageStatus> updateUserLevelById(@PathVariable Long id,@RequestBody UserLevelDTO userLevelDTO){
+    ResponseMessageStatus response = service.updateUserLevelByIdService(id,userLevelDTO);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<ResponseMessageStatus>,e tem como parâmetros,id do tipo Long recebido da anotação "PathVariable",e userLevelDTO do tipo UserLevelDTO vindo da anotação "RequestBody".
+#### A variável response,é do tipo ResponseMessageStatus,e recebe updateUserLevelByIdService() vindo de service,passando como argumentos,id e userLevelDTO.
+#### Retorna o método ok() de ResponseEntity,passando response como argumento.
+
+<br>
+
+#### • deleteUserLevelById - "/{id}" - DELETE
+```
+public ResponseEntity<Void> deleteUserLevelById(@PathVariable Long id){
+    service.deleteUserLevelByIdService(id);
+
+    return ResponseEntity.noContent().build();
+}
+```
+#### O método é do tipo ResponseEntity<Void>,e recebe como parâmetro id do tipo Long recuperado pela anotação "PathVariable".
+#### Acessa o método deleteUserLevelByIdService() de service,passando como argumento o id.
+#### Retorna o método noCotent() de ResponseEity,e logo depois acessa o método build().
+
+<br><br>
+
+### ▪ SectorController - "/sector"
+#### Depêndencias Injetadas:
+##### service - Acessa o serviço de Sector
+
+#### • createSector - POST
+```
+public ResponseEntity<ResponseMessageStatus> createSector(@RequestBody SectorDTO sector, UriComponentsBuilder uriBuilder){
+    ResponseMessageStatus response = service.createSector(sector);
+    URI path = uriBuilder.path("sector/{id}").buildAndExpand(sector.getId()).toUri();
+
+    return ResponseEntity.created(path).body(response);
+}
+```
+#### O método retorna ResponseEntity<ResponseMessageStatus>,recebe como parâmetros sector do tipo SectorDTO pela anotação "RequestBody",e uriBuilder do tipo UriComponentsBuilder.
+#### A variável response,é do tipo ResponseMessageStatus,acessa o método createSector() de service,passando como argumento sector.
+#### A variável path,é do tipo URI,e acessa o método path() de uriBuilder,passando como argumento o caminho até o id,acessa o método buildAndExpand,passando como argumento o id que é recuperado de sector,e acessa por fim o método toUri().
+#### Retorna o método created() de ResponseEntity,passando como argumento a variável path,acessa o método body() passando como argumento a variável response.
+
+<br>
+
+#### • getAllSector - GET
+```
+public ResponseEntity<Page<SectorDTO>> getAllSector(@PageableDefault(size = 15) Pageable pageable){
+    Page<SectorDTO> response = service.getAllSectorService(pageable);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<Page<SectorDTO>>,e tem como parâmetro,a anotação "PageableDefault" passando que o tamanho é até 15,e pageable do tipo Pageable.
+#### A variável response,do tipo Page<SectorDTO>,que acessa o método getAllSectorService() de service,passando como argumento pageable.
+#### Retorna o método ok() de ResponseEntity,passando como argumento response.
+
+<br>
+
+#### • getSectorById - "/{id}" - GET
+```
+public ResponseEntity<SectorDTO> getSectorById(@PathVariable Long id){
+    SectorDTO response = service.getSectorByIdService(id);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<SectorDTO>,e tem como parâmetro id do tipo Long que vem através da anotação "PathVariable".
+#### A variável response do tipo SectorDTO,acessa o método getSectorByIdService() de service,passando id como argumento.
+#### Retorna o método ok() de ResponseEntity,passando como argumento response.
+
+<br>
+
+#### • updateSetorById
+```
+public ResponseEntity<ResponseMessageStatus> updateSetorById(@PathVariable Long id,@RequestBody SectorDTO sectorDTO){
+    ResponseMessageStatus response = service.updateSectorByIdService(id,sectorDTO);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<ResponseMessageStatus>,e tem como parâmetros,id do tipo Long recebido da anotação "PathVariable",e sectorDTO do tipo SectorDTO vindo da anotação "RequestBody".
+#### A variável response,é do tipo ResponseMessageStatus,e recebe updateSectorByIdService() vindo de service,passando como argumentos,id e sectorDTO.
+#### Retorna o método ok() de ResponseEntity,passando response como argumento.
+
+<br>
+
+#### • deleteSectorById
+```
+public ResponseEntity<Void> deleteSectorById(@PathVariable Long id){
+    service.deleteSectorByIdService(id);
+
+    return ResponseEntity.noContent().build();
+}
+```
+#### O método é do tipo ResponseEntity<Void>,e recebe como parâmetro id do tipo Long recuperado pela anotação "PathVariable".
+#### Acessa o método deleteSectorByIdService() de service,passando como argumento o id.
+#### Retorna o método noCotent() de ResponseEity,e logo depois acessa o método build().
+
+<br><br>
+
+### ▪ EmployeeAddressController - "/address"
+#### Depêndencias Injetadas:
+##### viacepService - Acessa o serviço de Sector
+
+#### • verifyAddress - POST
+```
+public ResponseEntity<ResponseMessageStatus> verifyAddress(@RequestBody String cep, UriComponentsBuilder uriBuilder){
+    ResponseMessageStatus employeeAddressDTO = viacepService.verifyAddressService(cep);
+    URI path = uriBuilder.path("address/{cep}").buildAndExpand(cep).toUri();
+    return ResponseEntity.created(path).body(employeeAddressDTO);
+}
+```
+#### O método retorna ResponseEntity<ResponseMessageStatus>,recebe como parâmetros cep do tipo String pela anotação "RequestBody",e uriBuilder do tipo UriComponentsBuilder.
+#### A variável employeeAddressDTO,é do tipo ResponseMessageStatus,acessa o método verifyAddressService() de viacepService,passando como argumento cep.
+#### A variável path,é do tipo URI,e acessa o método path() de uriBuilder,passando como argumento o caminho até o cep,acessa o método buildAndExpand,passando como argumento o cep que é recuperado do próprio cep,e acessa por fim o método toUri().
+#### Retorna o método created() de ResponseEntity,passando como argumento a variável path,acessa o método body() passando como argumento a variável employeeAddressDTO.
+
+<br><br>
 
 
 
