@@ -50,14 +50,14 @@ public class UserLevelService {
     public UserLevelDTO getUserLevelByIdService(Long id){
         existsUserLevel(id);
 
-        UserLevel userLevel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nível de Usuário nnão encontrado"));
+        UserLevel userLevel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nível de Usuário não encontrado"));
         return modelMapper.map(userLevel, UserLevelDTO.class);
     }
 
     public ResponseMessageStatus updateUserLevelByIdService(Long id,UserLevelDTO userLevelDTO){
         existsUserLevel(id);
 
-        UserLevel userLevel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nível de Usuário nnão encontrado"));
+        UserLevel userLevel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nível de Usuário não encontrado"));
         userLevel.setName(userLevelDTO.getName());
         userLevel.setEnterprise_id(userLevelDTO.getEnterprise_id());
         repository.save(userLevel);
