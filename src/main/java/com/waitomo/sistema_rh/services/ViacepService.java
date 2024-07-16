@@ -73,10 +73,8 @@ public class ViacepService {
         Long result = repository.existsByCep(cep);
 
         if(result != 0){
-            System.out.println(result+" verdadeiro");
             return true;
         }else{
-            System.out.println(result+" falso");
             return false;
         }
     }
