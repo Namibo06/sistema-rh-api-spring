@@ -37,10 +37,8 @@ public class ViacepService {
             return new ResponseMessageStatus(MESSAGE_SUCCESS_OK, STATUS_SUCCESS_OK);
 
         } else {
-            System.out.println("Endereço não existe\n");
             cep = cep.replaceAll("[^0-9]", "");
             String url = "https://viacep.com.br/ws/"+cep+"/json";
-            System.out.println(url);
 
             try {
                 ResponseEntity<Map<String, String>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, String>>() {});
