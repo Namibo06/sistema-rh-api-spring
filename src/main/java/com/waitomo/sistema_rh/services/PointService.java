@@ -29,8 +29,6 @@ public class PointService {
     public ResponseMessageStatus createPointService(PointDTO pointDTO){
         Point pointModel = modelMapper.map(pointDTO, Point.class);
 
-        System.out.println(pointDTO.getEmployeeId());
-
         pointModel.setEmployeeId(pointDTO.getEmployeeId());
         pointModel.setDate(pointDTO.getDate());
         pointModel.setCheckInTime(pointDTO.getCheckInTime());
