@@ -976,7 +976,7 @@ public ResponseMessageStatus createEmployeeService(EmployeeDTO employeeDTO){
 }
 ```
 #### O método é do tipo ResponseMessageStatus,e recebe como parâmetro employeeDTO do tipo EmployeeDTO  
-#### A variável employeeModel do tipo Employee,recebe m mapeamento de employeeDTO para Employee.É setado em employeeModel o  firstName,lastName,dateNasciment,gender,sector,cep,cnpjEnterprise,userLevel,login,password e token,vindos de employeeDTO.
+#### A variável employeeModel do tipo Employee,recebe um mapeamento de employeeDTO para Employee.É setado em employeeModel o  firstName,lastName,dateNasciment,gender,sector,cep,cnpjEnterprise,userLevel,login,password e token,vindos de employeeDTO.
 #### Acessa o método save() de repository,e passa como argumento employeeModel.Acessa o método updateNumberEmployee() passando como parâmetro cnpjEnterprise.
 #### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status do tipo Integer,recebe valores personalizados.Retorna uma nova instância de ResponseMessageStatus,passando como argumentos,message e status. 
 
@@ -1035,10 +1035,97 @@ public ResponseMessageStatus updateEmployeeByIdService(Long id,EmployeeDTO emplo
     return new ResponseMessageStatus(message,status);
 }
 ```
+#### O método é do tipo ResponseMessageStatus,e recebe como parâmetros,id do tipo Long,e employeeDTO do tipo EmployeeDTO.
+#### Acessa o método existsEmployee(),passando id como argumento.
+#### A variável employee é do tipo Employee,e recebe o método  findById() de repository,passando id como argumento,acessa o método orElseThrow(),que lançará EntityNotFoundException com ma mensagem personalizada caso não encontre um registro no banco de dados.    
+#### É setado em employee o firstName,lastName,dateNasciment,gender,sector,cep,cnpjEnterprise,userLevel,login,password e token,vindos de employeeDTO.Acessa o método save() de repository,passando employee como argumento.
+#### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status do tipo Integer,recebe valores personalizados.Retorna uma nova instância de ResponseMessageStatus,passando como argumentos,message e status.
+
+<br>
+
+#### • deleteEmployeeById
+```
+public void deleteEmployeeById(Long id){
+    existsEmployee(id);
+
+    repository.deleteById(id);
+}
+```
+#### O método não tem retorno,e recebe como parâmetro id do tipo Long. 
+#### Acessa o método existsEmployee(),passando id como argumento.
+#### Acessa o método deleteById() de repository,passando id como argumento.
+
+<br>
+
+#### • existsEmployee
+```
+public void existsEmployee(Long id){
+    boolean existsEmployeeById = repository.existsById(id);
+
+    if(!existsEmployeeById){
+        throw new EntityNotFoundException("Funcionário não encontrado");
+    }
+}
+```
+#### O método não tem retorno,e recebe como parâmetro id do tipo Long.
+#### A variável existsEmployeeById é do tipo boolean,e recebe o método existsById() de repository,passando id como argumento. 
+#### E verificado se o retorno de existsEmployeeById é false,se for,lançará uma nova exceção EntityNotFoundException,com uma mensagem personalizada.
+
+<br>
+
+#### • updateNumberEmployee
+```
+public void updateNumberEmployee(String cnpj){
+    Enterprise enterprise= enterpriseRepository.findByCnpj(cnpj);
+    if(enterprise.getNumber_employees() == null){
+        enterprise.setNumber_employees(0);
+    }
+    enterprise.setNumber_employees(enterprise.getNumber_employees() + 1);
+    enterpriseRepository.save(enterprise);
+}
+```
+#### O método não tem retorno,e recebe como parâmetro cnpj do tipo String.
+#### A variável enterprise é do tipo Enterprise,recebe o método findByCnpj() de enterpriseRepository,passando cnpj como argumento.É verificado se o number_employees tem valor nulo,se tiver,é setado como 0. 
+#### Caso passe da condição,é setado number_employees,enterprise,passando seu valor mais um.
+#### É acessado o método save() de enterpriseRepository,passando enterprise como argumento.
+
+<br><br>
+
+### ▪ PointService
+#### Depêndencias Injetadas:
+##### repository - Acessa o repositório de PointRepository
+##### employeeRepository - Acessa o repositório de EmployeeRepository
+##### modelMapper - Mapea dados
+
+<br>
+
+#### • createPointService
+```
+public ResponseMessageStatus createPointService(PointDTO pointDTO){
+    Point pointModel = modelMapper.map(pointDTO, Point.class);
+
+    System.out.println(pointDTO.getEmployeeId());
+
+    pointModel.setEmployeeId(pointDTO.getEmployeeId());
+    pointModel.setDate(pointDTO.getDate());
+    pointModel.setCheckInTime(pointDTO.getCheckInTime());
+    pointModel.setCheckOutLunch(pointDTO.getCheckOutLunch());
+    pointModel.setBackLunch(pointDTO.getBackLunch());
+    pointModel.setCheckOutTime(pointDTO.getCheckOutTime());
+
+    repository.save(pointModel);
+
+    String message = "Ponto criado com sucesso!";
+    Integer status=201;
+    return new ResponseMessageStatus(message,status);
+}
+```
+#### O método é do tipo ResponseMessageStatus,e recebe um parâmetro,pointDTO do tipo PointDTO.
+#### 
 ####
 ####
-####
-####
+
+<br>
 
 
 
@@ -1416,11 +1503,86 @@ public ResponseEntity<Void> deleteEmployeeById(@PathVariable Long id){
 }
 ```
 #### O método é do tipo ResponseEntity<Void>,e recebe como parâmetro,id do tipo Long vindo através da anotação "PathVariable".
-#### Acessa o método deleteEmployeeById() de service,passando como argumento  id.
+#### Acessa o método deleteEmployeeById() de service,passando como argumento id.
 #### Retorna o método noContent() de ResponseEntity,e depois acessa o método build().
 
 <br><br>
 
+### ▪ PointController - "/point"
+#### Depêndencias Injetadas:
+##### service - Acessa o serviço de Point
+
+<br>
+
+#### • createPoint - POST
+```
+public ResponseEntity<ResponseMessageStatus> createPoint(@RequestBody PointDTO pointDTO, UriComponentsBuilder uriBuilder){
+    ResponseMessageStatus response = service.createPointService(pointDTO);
+    URI path = uriBuilder.path("/point/{id}").buildAndExpand(pointDTO.getId()).toUri();
+
+    return ResponseEntity.created(path).body(response);
+}
+```
+#### O método é do tipo ResponseEntity<ResponseMessageStatus>,e recebe como parãmetros,pointDTO do tipo PointDTO vindos de "RequestBody",uriBuilder do tipo UriComponentsBuilder.
+#### A variável response è do tipo ResponseMessageStatus,recebe o método createPointService() vindo de service,passando pointDTO por argumento.
+#### A variável path é do tipo URI,e recebe o método path() de uriBuilder,passando o caminho até o id,acessa o método buildAndExpand() passando o id vindo de pointDTO como argumento,e acessando por fim o método toURI().
+#### Retorna o método created() vindo de ResponseEntity,passando path como argumento,e acessa o método body() passando como argumento response.
+
+<br>
+
+#### • getAllPoint - GET
+```
+public ResponseEntity<Page<PointDTO>> getAllPoint(@PageableDefault(size = 15) Pageable pageable){
+    Page<PointDTO> response = service.getAllPointService(pageable);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<Page<PointDTO>>,e recebe por parâmetro,a anotação "PageableDefault" setando que o tamanho máximo de registro retornados serão  15,além de ter como parâmetro pageable do tipo Pageable.
+#### A variável response é do tipo Page<PointDTO>,e recebe o método getAllPointService() de service,passando pageable como argumento.
+#### Retorna o método ok() de ResponseEntity,passando response como argumento.
+
+<br>
+
+#### • getPointById - "/{id}" - GET
+```
+public ResponseEntity<PointDTO> getPointById(@PathVariable Long id){
+    PointDTO response = service.getPointByIdService(id);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<PointDTO>,e recebe como parâmetro,id do tipo Long vindo através da anotação "PathVariable".
+#### A variável response é do tipo PointDTO,e recebe o método getPointByIdService() de service,passando id como argumento.
+#### Retorna o método ok() de ResponseEntity,passando response como argumento.
+
+<br>
+
+#### • updatePointById - "/{id}" - PUT
+```
+public ResponseEntity<ResponseMessageStatus> updatePointById(@PathVariable Long id,@RequestBody PointDTO pointDTO){
+    ResponseMessageStatus response = service.updatePointByIdService(id,pointDTO);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<ResponseMessageStatus>,e recebe como parâmetro,id do tipo Long vindo através da anotação "PathVariable",e pointDTO do tipo PointDTO vindo através da anotação "RequestBody".
+#### A variável response e do tipo ResponseMessageStatus,e recebe o método updatePointByIdService(),passando id e pointDTO como argumento.
+#### Retorna o método ok() de ResponseEntity,passando response como argumento.
+
+<br>
+
+#### • deletePointById - "/{id}" - DELETE
+```
+public ResponseEntity<Void> deletePointById(@PathVariable Long id){
+    service.deletPointeById(id);
+
+    return ResponseEntity.noContent().build();
+}
+```
+#### O método é do tipo ResponseEntity<Void>,e recebe como parâmetro,id do tipo Long vindo através da anotação "PathVariable".
+#### Acessa o método deletePointById() de service,passando como argumento id.
+#### Retorna o método noContent() de ResponseEntity,e depois acessa o método build().
 
 
 
