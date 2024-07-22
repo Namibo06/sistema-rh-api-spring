@@ -866,6 +866,8 @@ public boolean existEnterpriseId(Long id){
 ##### restTemplate - Responsável por fazer chamadas HTTP síncronas e diretas,serve para se comunicar com outros serviços
 ##### modelMapper - Mapea dados
 
+<br>
+
 #### • verifyAddressService
 ```
 public ResponseMessageStatus verifyAddressService(String cep) {
@@ -937,6 +939,109 @@ public boolean existAddress(String cep){
 #### A variável cep,recebe o método replaceAll de cep,para permitir que somente haja números de 0 a 9,se tiver símbolos ou letras serão removidos.
 #### A variável result é do tipo Long,acessa o método existsByCep de repository,passando como argumento cep.
 #### É verificado se resul é diferente de 0,se for retorna true,senão retorna false.
+
+<br><br>
+
+### ▪ EmployeeService
+#### Depêndencias Injetadas:
+##### repository - Acessa o repositório de EmployeeRepository
+##### enterpriseRepository - Acessa o repositório de EnterpriseRepository
+##### encoder - Responsável por criptografar senhas
+##### modelMapper - Mapea dados
+
+<br>
+
+#### • createEmployeeService
+```
+public ResponseMessageStatus createEmployeeService(EmployeeDTO employeeDTO){
+    Employee employeeModel = modelMapper.map(employeeDTO, Employee.class);
+    employeeModel.setFirstName(employeeDTO.getFirstName());
+    employeeModel.setLastName(employeeDTO.getLastName());
+    employeeModel.setDateNasciment(employeeDTO.getDateNasciment());
+    employeeModel.setGender(employeeDTO.getGender());
+    employeeModel.setSector(employeeDTO.getSector());
+    employeeModel.setCep(employeeDTO.getCep());
+    employeeModel.setCnpjEnterprise(employeeDTO.getCnpjEnterprise());
+    employeeModel.setUserLevel(employeeDTO.getUserLevel());
+    employeeModel.setLogin(employeeDTO.getLogin());
+    employeeModel.setPassword(encoder.encode(employeeDTO.getPassword()));
+    employeeModel.setToken(employeeDTO.getToken());
+    repository.save(employeeModel);
+    
+    updateNumberEmployee(employeeDTO.getCnpjEnterprise());
+    
+    String message="Funcionário criado com sucesso";
+    Integer status=201;
+    return new ResponseMessageStatus(message,status);
+}
+```
+#### O método é do tipo ResponseMessageStatus,e recebe como parâmetro employeeDTO do tipo EmployeeDTO  
+#### A variável employeeModel do tipo Employee,recebe m mapeamento de employeeDTO para Employee.É setado em employeeModel o  firstName,lastName,dateNasciment,gender,sector,cep,cnpjEnterprise,userLevel,login,password e token,vindos de employeeDTO.
+#### Acessa o método save() de repository,e passa como argumento employeeModel.Acessa o método updateNumberEmployee() passando como parâmetro cnpjEnterprise.
+#### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status do tipo Integer,recebe valores personalizados.Retorna uma nova instância de ResponseMessageStatus,passando como argumentos,message e status. 
+
+<br>
+
+#### • getAllEmployeeService
+```
+public Page<EmployeeDTO> getAllEmployeeService(Pageable pageable){
+    return repository
+            .findAll(pageable)
+            .map(employee -> modelMapper.map(employee, EmployeeDTO.class));
+}
+```
+#### O método é do tipo Page<EmployeeDTO>,e recebe como parâmtro pageable do tipo Pageable.
+#### Retorna o método findAll() de repository passando pageable como argumento,acessa o método map() que tem como parâmetro employee,e realiza um mapeamento de employee para EmployeeDTO.  
+
+<br>
+
+#### • getEmployeeByIdService
+```
+public EmployeeDTO getEmployeeByIdService(Long id){
+    existsEmployee(id);
+
+    Employee employee = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+    return modelMapper.map(employee, EmployeeDTO.class);
+}
+```
+#### O método é do tipo EmployeeDTO,e recebe como parâmetro id do tipo Long.
+#### Acessa  o método existsEmployee() e passa id como argumento.
+#### A variável employee é do tipo Employee,e recebe o método findById() de repository,passando id como argumento,acessa o método orElseThrow(),que lançará uma nova exceção EntityNotFoundException,com uma mensagem personalizada.
+#### Retorna um mapeamento de employee para EmployeeDTO.
+
+<br>
+
+#### • updateEmployeeByIdService
+```
+public ResponseMessageStatus updateEmployeeByIdService(Long id,EmployeeDTO employeeDTO){
+    existsEmployee(id);
+    
+    Employee employee = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+    employee.setFirstName(employeeDTO.getFirstName());
+    employee.setLastName(employeeDTO.getLastName());
+    employee.setDateNasciment(employeeDTO.getDateNasciment());
+    employee.setGender(employeeDTO.getGender());
+    employee.setSector(employeeDTO.getSector());
+    employee.setCep(employeeDTO.getCep());
+    employee.setCnpjEnterprise(employeeDTO.getCnpjEnterprise());
+    employee.setUserLevel(employeeDTO.getUserLevel());
+    employee.setLogin(employeeDTO.getLogin());
+    employee.setPassword(encoder.encode(employeeDTO.getPassword()));
+    employee.setToken(employeeDTO.getToken());
+    repository.save(employee);
+    
+    String message = "Funcionário atualizado com sucesso";
+    Integer status = 200;
+    return new ResponseMessageStatus(message,status);
+}
+```
+####
+####
+####
+####
+
+
+
 
 
 --------------------------------------------------------------
@@ -1241,15 +1346,86 @@ public ResponseEntity<ResponseMessageStatus> verifyAddress(@RequestBody String c
 
 <br><br>
 
+### ▪ EmployeeController - "/employee"
+#### Depêndencias Injetadas:
+##### service - Acessa o serviço de Employee
+
+#### • createEmployee - POST
+```
+public ResponseEntity<ResponseMessageStatus> createEmployee(@RequestBody EmployeeDTO employee, UriComponentsBuilder uriBuilder){
+   ResponseMessageStatus response = service.createEmployeeService(employee);
+   URI path = uriBuilder.path("/employee/{id}").buildAndExpand(employee.getId()).toUri();
+   return ResponseEntity.created(path).body(response);
+}
+```
+#### O método é do tipo ResponseEntity<ResponseMessageStatus>,e recebe como parãmetros,employee do tipo EmployeeDTO vindos de "RequestBody",uriBuilder do tipo UriComponentsBuilder.
+#### A variável response è do tipo ResponseMessageStatus,recebe o método createEmployeeService() vindo de service,passando employee por argumento.
+#### A variável path é do tipo URI,e recebe o método path() de uriBuilder,passando o caminho até o id,acessa o método buildAndExpand() passando o id vindo de employee como argumento,e acessando por fim o método toURI().
+#### Retorna o método created() vindo de ResponseEntity,passando path como argumento,e acessa o método body() passando como argumento response. 
+
+<br>
+
+#### • getAllEmployee - GET
+```
+public ResponseEntity<Page<EmployeeDTO>> getAllEmployee(@PageableDefault(size = 15) Pageable pageable){
+    Page<EmployeeDTO> response = service.getAllEmployeeService(pageable);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<Page<EmployeeDTO>>,e recebe por parâmetro,a anotação "PageableDefault" setando que o tamanho máximo de registro retornados serão  15,além de ter como parâmetro pageable do tipo Pageable. 
+#### A variável response é do tipo Page<EmployeeDTO>,e recebe o método getAllEmployeeService() vindo de service,e passa pageable como argumento.
+#### Retorna o método ok() de ResponseEntity,passando response como argumento.
+
+<br>
+
+#### • getEmployeeById - "/{id}" - GET
+```
+public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id){
+    EmployeeDTO response = service.getEmployeeByIdService(id);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<EmployeeDTO>,e recebe por parâmetro,id do tipo Long,vindo pela anotação "PathVariable".
+#### A variável response é do tipo EmployeeDTO,e recebe o método getEmployeeByIdService() vindo de service,passando como argumento id.
+#### Retorna o método ok() de ResponseEntity,passando response como argumento.
+
+<br>
+
+#### • updateEmployeeById - "/{id}" - PUT
+```
+public ResponseEntity<ResponseMessageStatus> updateEmployeeById(@PathVariable Long id,@RequestBody EmployeeDTO employeeDTO){
+    ResponseMessageStatus response = service.updateEmployeeByIdService(id,employeeDTO);
+
+    return ResponseEntity.ok(response);
+}
+```
+#### O método é do tipo ResponseEntity<ResponseMessageStatus>,e recebe como parâmetros,id do tipo Long vindo da anotação "PathVariable",employeeDTO do tipo EmployeeDTO vindo da anotação "RequestBody". 
+#### A variável response é do tipo ResponseMessageStatus,e recebe o método updateEmployeeByIdService de service,passando como argumentos id e employeeDTO.
+#### Retorna o método ok() de ResponseEntity,passando response como argumento. 
+
+<br>
+
+#### • deleteEmployeeById - "/{id}" - DELETE
+```
+public ResponseEntity<Void> deleteEmployeeById(@PathVariable Long id){
+    service.deleteEmployeeById(id);
+
+    return ResponseEntity.noContent().build();
+}
+```
+#### O método é do tipo ResponseEntity<Void>,e recebe como parâmetro,id do tipo Long vindo através da anotação "PathVariable".
+#### Acessa o método deleteEmployeeById() de service,passando como argumento  id.
+#### Retorna o método noContent() de ResponseEntity,e depois acessa o método build().
+
+<br><br>
 
 
 
-//No login será o seguinte:
-//-tenho cnpj pelo funcionário que ira verificar de qual
-//empresa é,recuperando o id_da_empresa irei colocar nos
-//cookies ou localStorage do front
 
 
+// implementar o swagger
 // fazer login do funcionario,e deixar rotas restritas através do security
 // fazer consultas select com join para trazer os dados de userLevel por exemplo,trazendo o nome em vez do numero
-// falta documentar services e controllers
+// falta documentar services e controllers de employee e point
