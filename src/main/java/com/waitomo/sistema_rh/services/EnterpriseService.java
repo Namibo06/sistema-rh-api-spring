@@ -1,6 +1,7 @@
 package com.waitomo.sistema_rh.services;
 
 import com.waitomo.sistema_rh.dtos.*;
+import com.waitomo.sistema_rh.exceptions.NotFoundException;
 import com.waitomo.sistema_rh.models.EmployeeAddress;
 import com.waitomo.sistema_rh.models.Enterprise;
 import com.waitomo.sistema_rh.models.Sector;
@@ -97,7 +98,7 @@ public class EnterpriseService {
 
     public EnterpriseDTO findEnterpriseById(Long id){
         existsEnterprise(id);
-        Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada"));
+        Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new NotFoundException("Empresa",'a'));
 
         return modelMapper.map(enterprise, EnterpriseDTO.class);
     }
