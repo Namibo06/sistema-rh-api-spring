@@ -3,6 +3,7 @@ package com.waitomo.sistema_rh.controllers;
 import com.waitomo.sistema_rh.dtos.EnterpriseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.services.EnterpriseService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ public class EnterpriseController {
     private EnterpriseService enterpriseService;
 
     @PostMapping
+    @Operation(summary = "Criar empresa")
     public ResponseEntity<ResponseMessageStatus> createEnterprise(@RequestBody EnterpriseDTO enterprise, UriComponentsBuilder uriBuilder){
         ResponseMessageStatus enterpriseDTO=enterpriseService.createEnterpriseService(enterprise);
         URI path = uriBuilder.path("/enterprises/{id}").buildAndExpand(enterprise.getId()).toUri();
@@ -29,6 +31,7 @@ public class EnterpriseController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar empresas")
     public ResponseEntity<Page<EnterpriseDTO>> getAllEnterprises(@PageableDefault(size = 15)Pageable pageable){
         Page<EnterpriseDTO> enterprises=enterpriseService.findAllEnterprises(pageable);
 
@@ -36,12 +39,14 @@ public class EnterpriseController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obter uma empresa por id")
     public ResponseEntity<EnterpriseDTO> getEnterpriseById(@PathVariable Long id){
         EnterpriseDTO enterpriseDTO = enterpriseService.findEnterpriseById(id);
         return ResponseEntity.ok(enterpriseDTO);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar empresa por id")
     public ResponseEntity<ResponseMessageStatus> updateEnterpriseById(@PathVariable Long id,@RequestBody EnterpriseDTO enterpriseDTO){
         ResponseMessageStatus response = enterpriseService.updateEnterpriseByIdService(id,enterpriseDTO);
 
@@ -49,6 +54,7 @@ public class EnterpriseController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deletar empresa por id")
     public ResponseEntity<Void> deleteEnterpriseById(@PathVariable Long id){
         enterpriseService.deleteEnterpriseByIdService(id);
 

@@ -4,6 +4,7 @@ import com.waitomo.sistema_rh.dtos.LoginResponseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.dtos.TokenResponse;
 import com.waitomo.sistema_rh.services.LoginService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ public class LoginController {
     private LoginService service;
 
     @PostMapping
+    @Operation(summary = "Realizar login")
     public ResponseEntity<ResponseMessageStatus> login(@RequestBody LoginResponseDTO credentials){
         try {
 
@@ -38,6 +40,7 @@ public class LoginController {
     }
 
     @PostMapping("/token/{id}")
+    @Operation(summary = "Validar token")
     public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id, @RequestBody TokenResponse tokenResponse){
         ResponseMessageStatus response = service.verifyToken(id,tokenResponse.token());
 

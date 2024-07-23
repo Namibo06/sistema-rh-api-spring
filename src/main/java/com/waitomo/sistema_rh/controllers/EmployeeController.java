@@ -3,6 +3,7 @@ package com.waitomo.sistema_rh.controllers;
 import com.waitomo.sistema_rh.dtos.EmployeeDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.services.EmployeeService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ public class EmployeeController {
     private EmployeeService service;
 
     @PostMapping
+    @Operation(summary = "Criar funcionário")
     public ResponseEntity<ResponseMessageStatus> createEmployee(@RequestBody EmployeeDTO employee, UriComponentsBuilder uriBuilder){
        ResponseMessageStatus response = service.createEmployeeService(employee);
        URI path = uriBuilder.path("/employee/{id}").buildAndExpand(employee.getId()).toUri();
@@ -27,6 +29,7 @@ public class EmployeeController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar funcionários")
     public ResponseEntity<Page<EmployeeDTO>> getAllEmployee(@PageableDefault(size = 15) Pageable pageable){
         Page<EmployeeDTO> response = service.getAllEmployeeService(pageable);
 
@@ -34,6 +37,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obter um funcionário por id")
     public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id){
         EmployeeDTO response = service.getEmployeeByIdService(id);
 
@@ -41,6 +45,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar funcionário por id")
     public ResponseEntity<ResponseMessageStatus> updateEmployeeById(@PathVariable Long id,@RequestBody EmployeeDTO employeeDTO){
         ResponseMessageStatus response = service.updateEmployeeByIdService(id,employeeDTO);
 
@@ -48,6 +53,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deletar funcionário por id")
     public ResponseEntity<Void> deleteEmployeeById(@PathVariable Long id){
         service.deleteEmployeeById(id);
 

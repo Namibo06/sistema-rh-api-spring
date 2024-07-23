@@ -3,6 +3,7 @@ package com.waitomo.sistema_rh.controllers;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.dtos.SectorDTO;
 import com.waitomo.sistema_rh.services.SectorService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ public class SectorController {
     private SectorService service;
 
     @PostMapping
+    @Operation(summary = "Criar setor")
     public ResponseEntity<ResponseMessageStatus> createSector(@RequestBody SectorDTO sector, UriComponentsBuilder uriBuilder){
         ResponseMessageStatus response = service.createSector(sector);
         URI path = uriBuilder.path("sector/{id}").buildAndExpand(sector.getId()).toUri();
@@ -28,6 +30,7 @@ public class SectorController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar setores")
     public ResponseEntity<Page<SectorDTO>> getAllSector(@PageableDefault(size = 15) Pageable pageable){
         Page<SectorDTO> response = service.getAllSectorService(pageable);
 
@@ -35,6 +38,7 @@ public class SectorController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obter um setor por id")
     public ResponseEntity<SectorDTO> getSectorById(@PathVariable Long id){
         SectorDTO response = service.getSectorByIdService(id);
 
@@ -42,6 +46,7 @@ public class SectorController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizaar setor por id")
     public ResponseEntity<ResponseMessageStatus> updateSetorById(@PathVariable Long id,@RequestBody SectorDTO sectorDTO){
         ResponseMessageStatus response = service.updateSectorByIdService(id,sectorDTO);
 
@@ -49,6 +54,7 @@ public class SectorController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deletar setor por id")
     public ResponseEntity<Void> deleteSectorById(@PathVariable Long id){
         service.deleteSectorByIdService(id);
 

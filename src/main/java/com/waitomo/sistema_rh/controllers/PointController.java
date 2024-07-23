@@ -3,6 +3,7 @@ package com.waitomo.sistema_rh.controllers;
 import com.waitomo.sistema_rh.dtos.PointDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.services.PointService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ public class PointController {
     private PointService service;
 
     @PostMapping
+    @Operation(summary = "Criar ponto")
     public ResponseEntity<ResponseMessageStatus> createPoint(@RequestBody PointDTO pointDTO, UriComponentsBuilder uriBuilder){
         ResponseMessageStatus response = service.createPointService(pointDTO);
         URI path = uriBuilder.path("/point/{id}").buildAndExpand(pointDTO.getId()).toUri();
@@ -28,6 +30,7 @@ public class PointController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar pontos")
     public ResponseEntity<Page<PointDTO>> getAllPoint(@PageableDefault(size = 15) Pageable pageable){
         Page<PointDTO> response = service.getAllPointService(pageable);
 
@@ -35,6 +38,7 @@ public class PointController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obter um ponto por id")
     public ResponseEntity<PointDTO> getPointById(@PathVariable Long id){
         PointDTO response = service.getPointByIdService(id);
 
@@ -42,6 +46,7 @@ public class PointController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar ponto por id")
     public ResponseEntity<ResponseMessageStatus> updatePointById(@PathVariable Long id,@RequestBody PointDTO pointDTO){
         ResponseMessageStatus response = service.updatePointByIdService(id,pointDTO);
 
@@ -49,6 +54,7 @@ public class PointController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deletar ponto por id")
     public ResponseEntity<Void> deletePointById(@PathVariable Long id){
         service.deletPointeById(id);
 
