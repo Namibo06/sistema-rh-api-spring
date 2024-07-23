@@ -33,8 +33,11 @@
 #### ▪ ModelMapper
 #### ▪ JWT
 #### ▪ Hibernate
+#### ▪ Spring JPA
+#### ▪ Spring Security
 #### ▪ JUnit5
 #### ▪ Lombok
+#### ▪ Swagger
 
 <br>
 
@@ -120,6 +123,10 @@
 --------------------------------------------------------------
 
 ## DTOs
+### • ErrorResponseDTO
+#### message - String
+#### details - String
+
 ### • ResponseMessageStatus
 #### message - String
 #### status - Integer
@@ -194,6 +201,36 @@
 #### checkOutLunch - LocalDate
 #### backLunch - LocalDate
 #### checkOutTime - LocalDate
+
+--------------------------------------------------------------
+
+## Exceptions
+
+<br>
+
+### GlobalExceptionHandler
+#### • handleNotFoundException
+```
+public ResponseEntity<ErrorResponseDTO> handleNotFoundException(NotFoundException ex){
+    ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(),"Registro não encontrado");
+    return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+}
+```
+#### O método é do tipo ResponseEntity<ErrorResponseDTO>,recebe como parâmetro ex do tipo NotFoundException.  
+#### A variável errorResponse do tipo ErrorResponseDTO,recebe uma nova instância de ErrorResponseDTO,e passa o método getMessage() de ex,e uma mensagem como argumento.
+#### Retorna uma nova instância de ResponseEntity,passando errorResponse e a propriedade NOT_FOUND de HttpStatus como argumento.  
+
+
+<br><br>
+
+### NotFoundException
+#### Estende de RuntimeException,recebe um construtor,com parâmetros,className do tipo String,e sufix do tipo Character,acessa o método super na qual irá receber uma mensagem personalizada. 
+```
+public NotFoundException(String className,Character sufix){
+    super(className+ " não encontrad" +sufix);
+}
+```
+
 
 --------------------------------------------------------------
 
