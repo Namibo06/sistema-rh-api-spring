@@ -494,14 +494,14 @@ public Page<EnterpriseDTO> findAllEnterprises(Pageable pageable){
 ```
 public EnterpriseDTO findEnterpriseById(Long id){
     existsEnterprise(id);
-    Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada"));
+    Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new NotFoundException("Empresa",'a'));
 
     return modelMapper.map(enterprise, EnterpriseDTO.class);
 }
 ```
 #### O método retorna EnterpriseDTO,e recebe como parâmetro id do tipo Long.
 #### Acessa o método existsEnterprise() passando como argumento id,se voltar false,é lançada uma exceção,impedindo que siga os próximos passos do método findEnterpriseById().
-#### A variável enterprise,é do tipo Enterprise,recebe o método findById() da enterpriseRepository,logo após acessa o método orElseThrow() para evitar NullPointerException,ele lança uma exceção EntityNotFoundException com ma mensagem personalizada. 
+#### A variável enterprise,é do tipo Enterprise,recebe o método findById() da enterpriseRepository,logo após acessa o método orElseThrow() para evitar NullPointerException,ele lança uma exceção NotFoundException com ma mensagem personalizada. 
 #### O retorno é atráves do método map() do model mapper,que mapea os dados de enterprise para EnterpriseDTO.
 
 <br>
@@ -510,7 +510,7 @@ public EnterpriseDTO findEnterpriseById(Long id){
 ```
 public ResponseMessageStatus updateEnterpriseByIdService(Long id,EnterpriseDTO enterpriseDTO){
     existsEnterprise(id);
-    Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada"));
+    Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new NotFoundException("Empresa",'a'));
 
     enterprise.setCnpj(enterpriseDTO.getCnpj());
     enterprise.setFantasy_name(enterpriseDTO.getFantasy_name());
@@ -526,7 +526,7 @@ public ResponseMessageStatus updateEnterpriseByIdService(Long id,EnterpriseDTO e
 ```
 #### O método é do tipo ResponseMessageStatus,e recebe os parâmetros,id do tipo Long,e enterpriseDTO do tipo EnterpriseDTO.
 #### Acessa o método existsEnterprise() passando como argumento id,se voltar false,é lançada uma exceção,impedindo que siga os próximos passos do método findEnterpriseById().
-#### A variável enterprise,é do tipo Enterprise,recebe o método findById() da enterpriseRepository,logo após acessa o método orElseThrow() para evitar NullPointerException,ele lança uma exceção EntityNotFoundException com ma mensagem personalizada.
+#### A variável enterprise,é do tipo Enterprise,recebe o método findById() da enterpriseRepository,logo após acessa o método orElseThrow() para evitar NullPointerException,ele lança uma exceção NotFoundException com ma mensagem personalizada.
 #### É setado cnpj,fantasy name,company name,number employees em enterprise,passando por argumento os métodos acessores get vindo de enterpriseDTO.E no final acesso o método save() de enterpriseRepository,passando como argumento enterprise. 
 #### A variável message,é do tipo String,e recebe uma mensagem personalizada.A variável status,é do tipo Integer,e recebe um valor personalizado.O retorno é uma nova instância de ResponseMessageStatus,passando como argumentos,message e status.
 
@@ -537,14 +537,14 @@ public ResponseMessageStatus updateEnterpriseByIdService(Long id,EnterpriseDTO e
 public void deleteEnterpriseByIdService(Long id){
     boolean existsEnterprise=existsEnterprise(id);
     if(!existsEnterprise){
-        throw new RuntimeException("Empresa não existe");
+        throw new NotFoundException("Empresa",'a');
     }
     enterpriseRepository.deleteById(id);
 }
 ```
 #### O método não possui retorno,tem um parâmetro,id do tipo Long.
 #### A variável existsEnterprise,é do tipo boolean,recebe o método existsEnterprise,passando como argumento id.
-#### É verificado se o retorno existsEnterprise é false,e é lançada uma RuntimeException,com uma mensagem personalizada.
+#### É verificado se o retorno existsEnterprise é false,e é lançada uma NotFoundException,com uma mensagem personalizada.
 #### É acessado o método deleteById() de enterpriseRepository,passando id como argumento.
 
 <br>
@@ -555,14 +555,14 @@ public boolean existsEnterprise(Long id){
     boolean existEnterprise=enterpriseRepository.existsById(id);
 
     if(!existEnterprise){
-        throw new EntityNotFoundException("ID da empresa não encontrado");
+        throw new NotFoundException("Id",'o');
     }
     return true;
 }
 ```
 #### O método retorna um boolean,e recebe um parâmetro,id do tipo Long.
 #### A variável existEnterprise,é do tipo boolean,e recebe o método existsById de enterpriseRepository,passando id como argumento.
-#### É verificado se o retorno de existEnterprise é false,se for,irá ser lançada uma EntityNotFoundException,com uma mensagem personalizada.
+#### É verificado se o retorno de existEnterprise é false,se for,irá ser lançada uma NotFoundException,com uma mensagem personalizada.
 #### Se passar pela condição,é retornado true.
 
 <br>
@@ -578,7 +578,7 @@ public Long createUserLevelByEnterprise(Long enterpriseId){
 
     Long id=userLevelCreated.getId();
     if (id == null){
-        throw new NullPointerException("ID nulo");
+        throw new NotFoundException("Id",'o');
     }
     return id;
 }
@@ -586,7 +586,7 @@ public Long createUserLevelByEnterprise(Long enterpriseId){
 #### O método é do tipo Long,e recebe um parâmetro,enterpriseId do tipo Long.  
 #### A variável userLevel é do tipo UserLevel,que recebe uma nova instância de UserLevel.É setado em userLevel alguns valores personalizados como argumentos.A variável userLevelCreated,é do tipo UserLevel,e recebe o método save() de userLevelRepository,passando como argumento userLevel. 
 #### A variável id,é do tipo Long,e recebe userLevelCreated,acessando o id,pelo método acessor get.
-#### É verificado se idé igual a nulo,se for,é lançada uma exceção NullPointerException com uma mensagem personalizada,caso passe pela condição,é retornado o id.
+#### É verificado se id é igual a nulo,se for,é lançada uma exceção NotFoundException com uma mensagem personalizada,caso passe pela condição,é retornado o id.
 
 <br>
 
@@ -601,7 +601,7 @@ public Long createSectorByEnterprise(Long enterpriseId){
 
     Long id = sectorCreated.getId();
     if(id == null){
-        throw new NullPointerException("ID nulo");
+        throw new NotFoundException("Id",'o');
     }
     return id;
 }
@@ -609,7 +609,7 @@ public Long createSectorByEnterprise(Long enterpriseId){
 #### O método é do tipo Long,e recebe um parâmetro,enterpriseId do tipo Long.
 #### A variável sector é do tipo Sector,que recebe uma nova instância de Sector.É setado em sector alguns valores personalizados como argumentos.A variável sectorCreated,é do tipo Sector,e recebe o método save() de sectorRepository,passando como argumento sector.
 #### A variável id,é do tipo Long,e recebe sectorCreated,acessando o id,pelo método acessor get.
-#### É verificado se idé igual a nulo,se for,é lançada uma exceção NullPointerException com uma mensagem personalizada,caso passe pela condição,é retornado o id.
+#### É verificado se id é igual a nulo,se for,é lançada uma exceção NotFoundException com uma mensagem personalizada,caso passe pela condição,é retornado o id.
 
 <br><br>
 
