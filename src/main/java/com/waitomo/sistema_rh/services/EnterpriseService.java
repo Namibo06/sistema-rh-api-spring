@@ -105,7 +105,7 @@ public class EnterpriseService {
 
     public ResponseMessageStatus updateEnterpriseByIdService(Long id,EnterpriseDTO enterpriseDTO){
         existsEnterprise(id);
-        Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada"));
+        Enterprise enterprise=enterpriseRepository.findById(id).orElseThrow(() -> new NotFoundException("Empresa",'a'));
 
         enterprise.setCnpj(enterpriseDTO.getCnpj());
         enterprise.setFantasy_name(enterpriseDTO.getFantasy_name());
@@ -122,7 +122,7 @@ public class EnterpriseService {
     public void deleteEnterpriseByIdService(Long id){
         boolean existsEnterprise=existsEnterprise(id);
         if(!existsEnterprise){
-            throw new RuntimeException("Empresa não existe");
+            throw new NotFoundException("Empresa",'a');
         }
         enterpriseRepository.deleteById(id);
     }
@@ -131,7 +131,7 @@ public class EnterpriseService {
         boolean existEnterprise=enterpriseRepository.existsById(id);
 
         if(!existEnterprise){
-            throw new EntityNotFoundException("ID da empresa não encontrado");
+            throw new NotFoundException("Empresa",'a');
         }
         return true;
     }
@@ -145,7 +145,7 @@ public class EnterpriseService {
 
         Long id=userLevelCreated.getId();
         if (id == null){
-            throw new NullPointerException("ID nulo");
+            throw new NotFoundException("Id",'o');
         }
         return id;
     }
@@ -159,7 +159,7 @@ public class EnterpriseService {
 
         Long id = sectorCreated.getId();
         if(id == null){
-            throw new NullPointerException("ID nulo");
+            throw new NotFoundException("Id",'o');
         }
         return id;
     }
