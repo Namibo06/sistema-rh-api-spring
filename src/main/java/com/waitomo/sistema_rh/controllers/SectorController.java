@@ -2,6 +2,7 @@ package com.waitomo.sistema_rh.controllers;
 
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.dtos.SectorDTO;
+import com.waitomo.sistema_rh.models.Sector;
 import com.waitomo.sistema_rh.services.SectorService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,17 @@ public class SectorController {
     @Autowired
     private SectorService service;
 
+    final String MESSAGE_CREATED="Setor criado com sucesso";
+    final Integer STATUS_CREATED=200;
+
     @PostMapping
     @Operation(summary = "Criar setor")
     public ResponseEntity<ResponseMessageStatus> createSector(@RequestBody SectorDTO sector, UriComponentsBuilder uriBuilder){
-        ResponseMessageStatus response = service.createSector(sector);
-        URI path = uriBuilder.path("sector/{id}").buildAndExpand(sector.getId()).toUri();
+        Sector sectorModel = service.createSectorService(sector);
+        Long sectorId = sectorModel.getId();
+        URI path = uriBuilder.path("sector/{id}").buildAndExpand(sectorId).toUri();
+
+        ResponseMessageStatus response = new ResponseMessageStatus(MESSAGE_CREATED,STATUS_CREATED);
 
         return ResponseEntity.created(path).body(response);
     }
