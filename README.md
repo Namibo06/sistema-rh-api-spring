@@ -167,7 +167,6 @@
 <br>
 
 ### • EnterpriseDTO
-#### id - Long
 #### cnpj - String
 #### fantasy_name - String
 #### company_name - String
@@ -176,7 +175,6 @@
 <br>
 
 ### • SectorDTO
-#### id - Long
 #### name - String
 #### enterprise_id - Long
 
@@ -199,7 +197,6 @@
 <br>
 
 ### • EmployeeDTO
-#### id - Long
 #### firstName - String
 #### lastName - String
 #### dateNasciment - LocalDate
@@ -215,7 +212,6 @@
 <br>
 
 ### • PointDTO
-#### id - Long
 #### employeeId - Long
 #### date - LocalDate
 #### checkInTime - LocalDate
@@ -254,6 +250,19 @@ public ResponseEntity<ErrorResponseDTO> handleBadRequestException(BadRequestExce
 #### A variável errorResponse do tipo ErrorResponseDTO,recebe uma nova instância de ErrorResponseDTO,e passa o método getMessage() de ex,e uma mensagem como argumento.
 #### Retorna uma nova instância de ResponseEntity,passando errorResponse e a propriedade BAD_REQUEST de HttpStatus como argumento.
 
+<br>
+
+#### • handleAlreadyExistsException
+```
+public ResponseEntity<ErrorResponseDTO> handleAlreadyExistsException(AlreadyExistsException ex){
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(), "Registro já existente");
+        return new ResponseEntity<>(errorResponse,HttpStatus.CONFLICT);
+    }
+```
+#### O método é do tipo ResponseEntity<ErrorResponseDTO>,recebe como parâmetro ex do tipo AlreadyExistsException.
+#### A variável errorResponse do tipo ErrorResponseDTO,recebe uma nova instância de ErrorResponseDTO,e passa o método getMessage() de ex,e uma mensagem como argumento.
+#### Retorna uma nova instância de ResponseEntity,passando errorResponse e a propriedade CONFLICT de HttpStatus como argumento.
+
 
 <br><br>
 
@@ -264,6 +273,11 @@ public ResponseEntity<ErrorResponseDTO> handleBadRequestException(BadRequestExce
 
 ### BadRequestException
 #### Estende de RuntimeException,recebe um construtor,com um parâmetro,message do tipo String,acessa o método super na qual irá receber uma mensagem personalizada.
+
+<br>
+
+### AlreadyExistsException
+#### Estende de RuntimeException,recebe um construtor,com parâmetros,sufix do tipo Character,e classNamme do tipo String,acessa o método super na qual irá receber uma mensagem personalizada.
 
 
 --------------------------------------------------------------
@@ -785,60 +799,51 @@ public boolean existEnterpriseId(Long id){
 
 #### • createSector
 ```
-public ResponseMessageStatus createSector(SectorDTO sectorDTO){
-    final String MESSAGE_SUCCESS="Setor criado com sucesso";
-    final Integer STATUS_SUCCESS=200;
-    final String MESSAGE_FAILED="Este setor já existe";
-    final Integer STATUS_FAILED=409;
-    final String MESSAGE_BAD="ID da Empresa não encontrado";
-    final Integer STATUS_BAD=404;
-
+public Sector createSector(SectorDTO sectorDTO){
     if(!existEnterpriseId(sectorDTO.getEnterprise_id())){
-        return new ResponseMessageStatus(
-                MESSAGE_BAD,
-                STATUS_BAD
-        );
+        throw new NotFoundException("ID da Empresa",'o');
     }
 
     boolean existSectorName=existSector(sectorDTO.getName(),sectorDTO.getEnterprise_id());
 
     if(existSectorName){
-        return new ResponseMessageStatus(
-                MESSAGE_FAILED,
-                STATUS_FAILED
-        );
+        throw new AlreadyExistsException('e',"setor");
+
     }else{
         Sector sectorModel = modelMapper.map(sectorDTO, Sector.class);
         sectorModel.setName(sectorDTO.getName());
         sectorModel.setEnterprise_id(sectorDTO.getEnterprise_id());
         repository.save(sectorModel);
 
-        return new ResponseMessageStatus(
-                MESSAGE_SUCCESS,
-                STATUS_SUCCESS
-        );
+        return sectorModel;
     }
 }
 ```
-#### O método é do tipo ResponseMessageStatus,e tem como parâmetro,sectorDTO que é do tipo SectorDTO.
-#### É setado seis constantes,dentre elas message e status personalizados.
-#### É verificado se o método existEnterpriseId(),que passa enterpriseId vindo de sectorDTO,retorna false,se for,retorna uma nova instância de ResponseMessageStatus,passando como argumentos,MESSAGE_BAD e STATUS_BAD.
+#### O método é do tipo Sector,e tem como parâmetro,sectorDTO que é do tipo SectorDTO.
+#### É verificado se o método existEnterpriseId(),que passa enterpriseId vindo de sectorDTO,retorna false,se for,retorna uma nova instância de NotFoundException,passando "ID da Empresa" e 'o' como argumento.
 #### A variável existSectorName,é do tipo boolean,e recebe o método existSector(),que passa como argumentos,name e enterpriseId vindos de sectorDTO.
-#### É verificado se o método existSectorName(),retorna true,se for,retorna uma nova instância de ResponseMessageStatus,passando como argumentos,MESSAGE_FAILED e STATUS_FAILED.
-#### Senão a variável sectorModel do tipo Sector,acessa o método map() para fazer o mapeamento de sectorDTO para Sector.É setado para sectorModel name e enterpriseId vindos de sectorDTO,logo após é acessado o método save() de repository,passando como argumento sectorModel,e retorna uma nova instância de ResponseMessageStatus,passando como argumentos,MESSAGE_SUCCESS e STATUS_SUCCESS. 
+#### É verificado se o método existSectorName(),retorna true,se for,retorna uma nova instância de AlreadyExistsException,passando 'e' e "setor" como argumentos.
+#### Senão a variável sectorModel do tipo Sector,acessa o método map() para fazer o mapeamento de sectorDTO para Sector.É setado para sectorModel name e enterpriseId vindos de sectorDTO,logo após é acessado o método save() de repository,passando como argumento sectorModel,e retorna sectorModel. 
 
 <br>
 
 #### • getAllSectorService
 ```
 public Page<SectorDTO> getAllSectorService(Pageable pageable){
-    return repository
-            .findAll(pageable)
+    Page<Sector> sectorPage = repository.findAll(pageable);
+
+    if(sectorPage.isEmpty()){
+        throw new NotFoundException("Setores",'o');
+    }
+
+    return sectorPage
             .map(sector -> modelMapper.map(sector, SectorDTO.class));
 }
 ```
 #### O método retorna Page<SectorDTO>,e recebe como parâmetro,pageable que é do tipo Pageable.
-#### Retorna o método findAll() vindo de repository,que passa por argumento pageable,e acessa o método map(),passando por parâmetro sector,que realiza o mapeamento de sector para SectorDTO.
+#### A variável sectorPage,é do tipo Page<Sector>,e recebe o método findAll() de repository,passando pageable como argumento.
+#### É verificado se sectorPage é vazio,se for,é lançado uma nova exceção de NotFoundException,passando "Setores" e 'o' como argumentos.
+#### Retorna o método map() vindo de sectorPage,passando por parâmetro sector,que realiza o mapeamento de sector para SectorDTO.
 
 <br>
 
@@ -847,13 +852,13 @@ public Page<SectorDTO> getAllSectorService(Pageable pageable){
 public SectorDTO getSectorByIdService(Long id){
     existsSectorById(id);
 
-    Sector sector = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Setor não encontrado"));
+    Sector sector = repository.findById(id).orElseThrow(() -> new NotFoundException("Setor",'o'));
     return modelMapper.map(sector, SectorDTO.class);
 }
 ```
 #### O método retorna SectorDTO,e recebe como parâmetro id do tipo Long.
 #### Acessa o método existsSectorById() que passa id como argumento.
-#### A variável sector é do tipo Sector,e acessa o método findById() vindo de repository,passa como argumento o id,e acessa o método orElseThrow(),lançando uma exceção EntityNotFoundException com uma mensagem personalizada caso não ache o id do Sector.
+#### A variável sector é do tipo Sector,e acessa o método findById() vindo de repository,passa como argumento o id,e acessa o método orElseThrow(),lançando uma exceção NotFoundException com uma mensagem personalizada caso não ache o id do Sector.
 #### Retorna um mapeamento através do método map() de sector para SectorDTO.
 
 <br>
@@ -863,7 +868,7 @@ public SectorDTO getSectorByIdService(Long id){
 public ResponseMessageStatus updateSectorByIdService(Long id,SectorDTO sectorDTO){
     existsSectorById(id);
 
-    Sector sector = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Setor não encontrado"));
+    Sector sector = repository.findById(id).orElseThrow(() -> new NotFoundException("Setor",'o'));
     sector.setName(sectorDTO.getName());
     sector.setEnterprise_id(sectorDTO.getEnterprise_id());
     repository.save(sector);
@@ -875,7 +880,7 @@ public ResponseMessageStatus updateSectorByIdService(Long id,SectorDTO sectorDTO
 ```
 #### O método é do tipo ResponseMessageStatus,e recebe por parâmetros,id do tipo Long,e sectorDTO do tipo SectorDTO.
 #### Acessa o método existsSectorById() passando id como argumento.
-#### A variável sector,é do tipo Sector,e recebe o método findById() de repository,passando id como argumento,acessando o método orElseThrow() que lançará uma nova exceção EntityNotFoundException com uma mensagem personalizada.
+#### A variável sector,é do tipo Sector,e recebe o método findById() de repository,passando id como argumento,acessando o método orElseThrow() que lançará uma nova exceção NotFoundException com uma mensagem personalizada.
 #### É setado em sector,name e enterpriseId vindos de sectorDTO.Acessa o método save() de repository,passando como argumento sector.
 #### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status é do tipo Integer,e recebe um valor personalizado.Por fim retorna uma nova instância de ResponseMessageStatus,passando como argumentos message e status.
 
@@ -915,13 +920,13 @@ public void existsSectorById(Long id){
     boolean existsSector = repository.existsById(id);
 
     if(!existsSector){
-        throw new EntityNotFoundException("Setor não encontrado");
+        throw new NotFoundException("Setor",'o');
     }
 }
 ```
 #### O método não tem retorno,e recebe o parâmetro id que é do tipo Long.
 #### A variável existsSector é do tipo boolean,que acessa existsById() de repository,passando id como argumento.
-#### É verificado se o retorno de existsSector é false,se for,é lançado uma nova exceção EntityNotFoundException com uma mensagem persoalizada.
+#### É verificado se o retorno de existsSector é false,se for,é lançado uma nova exceção NotFoundException com uma mensagem persoalizada.
 
 <br>
 
