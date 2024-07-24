@@ -89,6 +89,11 @@ public class EnterpriseService {
     }
 
     public Page<EnterpriseDTO> findAllEnterprises(Pageable pageable){
+        List<Enterprise> enterprises = enterpriseRepository.findAll();
+        if(enterprises.isEmpty()){
+            throw new NotFoundException("Empresas",'a');
+        }
+
         return enterpriseRepository
                 .findAll(pageable)
                 .map(enterprise ->
