@@ -23,8 +23,14 @@ public class EmployeeController {
     @PostMapping
     @Operation(summary = "Criar funcionário")
     public ResponseEntity<ResponseMessageStatus> createEmployee(@RequestBody EmployeeDTO employee, UriComponentsBuilder uriBuilder){
-       ResponseMessageStatus response = service.createEmployeeService(employee);
-       URI path = uriBuilder.path("/employee/{id}").buildAndExpand(employee.getId()).toUri();
+        EmployeeDTO employeeDTO = service.createEmployeeService(employee);
+        Long employeeId = employeeDTO.getId();
+        URI path = uriBuilder.path("/employee/{id}").buildAndExpand(employeeId).toUri();
+
+        String message="Funcionário criado com sucesso";
+        Integer status=201;
+        ResponseMessageStatus response = new ResponseMessageStatus(message,status);
+
        return ResponseEntity.created(path).body(response);
     }
 
