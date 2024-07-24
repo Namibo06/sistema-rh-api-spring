@@ -2,6 +2,7 @@ package com.waitomo.sistema_rh.services;
 
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.dtos.UserLevelDTO;
+import com.waitomo.sistema_rh.exceptions.NotFoundException;
 import com.waitomo.sistema_rh.models.UserLevel;
 import com.waitomo.sistema_rh.repositories.EnterpriseRepository;
 import com.waitomo.sistema_rh.repositories.UserLevelRepository;
@@ -25,20 +26,18 @@ public class UserLevelService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public ResponseMessageStatus createUserLevelService(UserLevelDTO userLevel){
+    public UserLevel createUserLevelService(UserLevelDTO userLevel){
         UserLevel userLevelModel = modelMapper.map(userLevel, UserLevel.class);
         userLevelModel.setName(userLevel.getName());
+
         if(!existEnterpriseId(userLevel.getEnterprise_id())){
-            throw new EntityNotFoundException("ID da empresa não encontrado");
+            throw new NotFoundException("ID da empresa",'o');
         }
 
         userLevelModel.setEnterprise_id(userLevel.getEnterprise_id());
         repository.save(userLevelModel);
 
-        String message = "Nível de usuário criado com sucesso";
-        Integer status = 201;
-
-        return new ResponseMessageStatus(message,status);
+        return userLevelModel;
     }
 
     public Page<UserLevelDTO> getAllUserLevelService(Pageable pageable){
