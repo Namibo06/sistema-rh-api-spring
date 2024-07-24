@@ -4,6 +4,7 @@ import com.waitomo.sistema_rh.dtos.EnterpriseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.services.EnterpriseService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,7 @@ public class EnterpriseController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar empresas")
+    @Operation(summary = "Listar empresas",security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Page<EnterpriseDTO>> getAllEnterprises(@PageableDefault(size = 15)Pageable pageable){
         Page<EnterpriseDTO> enterprises=enterpriseService.findAllEnterprises(pageable);
 
