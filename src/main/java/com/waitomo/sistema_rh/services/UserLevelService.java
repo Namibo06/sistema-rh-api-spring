@@ -41,8 +41,13 @@ public class UserLevelService {
     }
 
     public Page<UserLevelDTO> getAllUserLevelService(Pageable pageable){
-        return repository
-                .findAll(pageable)
+        Page<UserLevel> userLevelPage = repository.findAll(pageable);
+
+        if(userLevelPage.isEmpty()){
+            throw new NotFoundException("Níveis de usuário",'o');
+        }
+
+        return userLevelPage
                 .map(userLevel -> modelMapper.map(userLevel, UserLevelDTO.class));
     }
 
