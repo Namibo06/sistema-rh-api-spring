@@ -66,7 +66,6 @@ public class EnterpriseService {
         String cepDefault = "44095400";
 
         EmployeeDTO employeeDTO = new EmployeeDTO(
-                null,
                 "root",
                 null,
                 LocalDate.of(2003,10,06),
