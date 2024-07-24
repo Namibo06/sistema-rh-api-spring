@@ -20,4 +20,10 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(), "Erro na requisição");
         return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAlreadyExistsException(AlreadyExistsException ex){
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(), "Registro já existente");
+        return new ResponseEntity<>(errorResponse,HttpStatus.CONFLICT);
+    }
 }
