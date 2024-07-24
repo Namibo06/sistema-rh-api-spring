@@ -2,6 +2,7 @@ package com.waitomo.sistema_rh.controllers;
 
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.dtos.UserLevelDTO;
+import com.waitomo.sistema_rh.models.UserLevel;
 import com.waitomo.sistema_rh.services.UserLevelService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,17 @@ public class UserLevelController {
     @Autowired
     private UserLevelService service;
 
+    final static String MESSAGE_CREATED = "Nível de usuário criado com sucesso";
+    final static Integer STATUS_CREATED = 201;
+
     @PostMapping
     @Operation(summary = "Criar nível de usuário")
     public ResponseEntity<ResponseMessageStatus> createUserLevel(@RequestBody UserLevelDTO userLevel, UriComponentsBuilder uriBuilder){
-        ResponseMessageStatus response = service.createUserLevelService(userLevel);
-        URI path = uriBuilder.path("user_level/{id}").buildAndExpand(userLevel.getId()).toUri();
+        UserLevel userLevelModel = service.createUserLevelService(userLevel);
+        Long userLevelId = userLevelModel.getId();
+        URI path = uriBuilder.path("user_level/{id}").buildAndExpand(userLevelId).toUri();
 
+        ResponseMessageStatus response = new ResponseMessageStatus(MESSAGE_CREATED,STATUS_CREATED);
         return ResponseEntity.created(path).body(response);
     }
 
