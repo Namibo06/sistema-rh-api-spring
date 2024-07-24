@@ -49,22 +49,27 @@ public class SectorService {
     }
 
     public Page<SectorDTO> getAllSectorService(Pageable pageable){
-        return repository
-                .findAll(pageable)
+        Page<Sector> sectorPage = repository.findAll(pageable);
+
+        if(sectorPage.isEmpty()){
+            throw new NotFoundException("Setores",'o');
+        }
+
+        return sectorPage
                 .map(sector -> modelMapper.map(sector, SectorDTO.class));
     }
 
     public SectorDTO getSectorByIdService(Long id){
         existsSectorById(id);
 
-        Sector sector = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Setor não encontrado"));
+        Sector sector = repository.findById(id).orElseThrow(() -> new NotFoundException("Setor",'o'));
         return modelMapper.map(sector, SectorDTO.class);
     }
 
     public ResponseMessageStatus updateSectorByIdService(Long id,SectorDTO sectorDTO){
         existsSectorById(id);
 
-        Sector sector = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Setor não encontrado"));
+        Sector sector = repository.findById(id).orElseThrow(() -> new NotFoundException("Setor",'o'));
         sector.setName(sectorDTO.getName());
         sector.setEnterprise_id(sectorDTO.getEnterprise_id());
         repository.save(sector);
@@ -90,7 +95,7 @@ public class SectorService {
         boolean existsSector = repository.existsById(id);
 
         if(!existsSector){
-            throw new EntityNotFoundException("Setor não encontrado");
+            throw new NotFoundException("Setor",'o');
         }
     }
 
