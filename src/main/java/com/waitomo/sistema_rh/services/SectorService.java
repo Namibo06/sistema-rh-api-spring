@@ -2,6 +2,8 @@ package com.waitomo.sistema_rh.services;
 
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.dtos.SectorDTO;
+import com.waitomo.sistema_rh.exceptions.AlreadyExistsException;
+import com.waitomo.sistema_rh.exceptions.NotFoundException;
 import com.waitomo.sistema_rh.models.Enterprise;
 import com.waitomo.sistema_rh.models.Sector;
 import com.waitomo.sistema_rh.repositories.EnterpriseRepository;
@@ -26,38 +28,23 @@ public class SectorService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public ResponseMessageStatus createSector(SectorDTO sectorDTO){
-        final String MESSAGE_SUCCESS="Setor criado com sucesso";
-        final Integer STATUS_SUCCESS=200;
-        final String MESSAGE_FAILED="Este setor já existe";
-        final Integer STATUS_FAILED=409;
-        final String MESSAGE_BAD="ID da Empresa não encontrado";
-        final Integer STATUS_BAD=404;
-
+    public Sector createSectorService(SectorDTO sectorDTO){
         if(!existEnterpriseId(sectorDTO.getEnterprise_id())){
-            return new ResponseMessageStatus(
-                    MESSAGE_BAD,
-                    STATUS_BAD
-            );
+            throw new NotFoundException("ID da Empresa",'o');
         }
 
         boolean existSectorName=existSector(sectorDTO.getName(),sectorDTO.getEnterprise_id());
 
         if(existSectorName){
-            return new ResponseMessageStatus(
-                    MESSAGE_FAILED,
-                    STATUS_FAILED
-            );
+            throw new AlreadyExistsException('e',"setor");
+
         }else{
             Sector sectorModel = modelMapper.map(sectorDTO, Sector.class);
             sectorModel.setName(sectorDTO.getName());
             sectorModel.setEnterprise_id(sectorDTO.getEnterprise_id());
             repository.save(sectorModel);
 
-            return new ResponseMessageStatus(
-                    MESSAGE_SUCCESS,
-                    STATUS_SUCCESS
-            );
+            return sectorModel;
         }
     }
 
