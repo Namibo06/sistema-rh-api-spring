@@ -43,7 +43,7 @@ public class EnterpriseService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public ResponseMessageStatus createEnterpriseService(EnterpriseDTO enterprise){
+    public EnterpriseDTO createEnterpriseService(EnterpriseDTO enterprise){
         Enterprise enterpriseModel = new Enterprise();
 
         enterpriseModel.setCnpj(enterprise.getCnpj());
@@ -79,13 +79,7 @@ public class EnterpriseService {
                 null);
         employeeService.createEmployeeService(employeeDTO);
 
-        String message="Empresa criada com sucesso!";
-        Integer status = 201;
-
-        return new ResponseMessageStatus(
-                message,
-                status
-        );
+        return modelMapper.map(enterpriseModel,EnterpriseDTO.class);
     }
 
     public Page<EnterpriseDTO> findAllEnterprises(Pageable pageable){
