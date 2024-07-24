@@ -2,6 +2,7 @@ package com.waitomo.sistema_rh.controllers;
 
 import com.waitomo.sistema_rh.dtos.EmployeeDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
+import com.waitomo.sistema_rh.models.Employee;
 import com.waitomo.sistema_rh.services.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,8 @@ public class EmployeeController {
     @PostMapping
     @Operation(summary = "Criar funcionário")
     public ResponseEntity<ResponseMessageStatus> createEmployee(@RequestBody EmployeeDTO employee, UriComponentsBuilder uriBuilder){
-        EmployeeDTO employeeDTO = service.createEmployeeService(employee);
-        Long employeeId = employeeDTO.getId();
+        Employee employeeModel = service.createEmployeeService(employee);
+        Long employeeId = employeeModel.getId();
         URI path = uriBuilder.path("/employee/{id}").buildAndExpand(employeeId).toUri();
 
         String message="Funcionário criado com sucesso";
