@@ -33,7 +33,7 @@ public class EnterpriseController {
 
     @GetMapping
     @Operation(summary = "Listar empresas",security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Page<EnterpriseDTO>> getAllEnterprises(@PageableDefault(size = 15)Pageable pageable){
+    public ResponseEntity<Page<EnterpriseDTO>> getAllEnterprises(@PageableDefault(size = 15) Pageable pageable){
         Page<EnterpriseDTO> enterprises=enterpriseService.findAllEnterprises(pageable);
 
         return ResponseEntity.ok(enterprises);
