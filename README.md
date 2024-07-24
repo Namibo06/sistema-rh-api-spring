@@ -1709,20 +1709,33 @@ public ResponseEntity<Void> deleteEmployeeById(@PathVariable Long id){
 #### Depêndencias Injetadas:
 ##### service - Acessa o serviço de Point
 
+#### Variáveis:
+```
+final static String MESSAGE_CREATED = "Ponto criado com sucesso!";
+
+final static Integer STATUS_CREATED = 201;
+```
+##### A variável MESSAGE_CREATED,é constante e estática,é do tipo String,e retorna uma mensagem personalizada. 
+##### A variável STATUS_CREATED,é constante e estática,é do tipo Integer,e retorna um valor personalizado,para status HTTP do tipo created.
+
 <br>
 
 #### • createPoint - POST
 ```
 public ResponseEntity<ResponseMessageStatus> createPoint(@RequestBody PointDTO pointDTO, UriComponentsBuilder uriBuilder){
-    ResponseMessageStatus response = service.createPointService(pointDTO);
-    URI path = uriBuilder.path("/point/{id}").buildAndExpand(pointDTO.getId()).toUri();
+    Point pointModel = service.createPointService(pointDTO);
+    Long pointId = pointModel.getId();
+    URI path = uriBuilder.path("/point/{id}").buildAndExpand(pointId).toUri();
+
+    ResponseMessageStatus response = new ResponseMessageStatus(MESSAGE_CREATED,STATUS_CREATED);
 
     return ResponseEntity.created(path).body(response);
 }
 ```
 #### O método é do tipo ResponseEntity<ResponseMessageStatus>,e recebe como parãmetros,pointDTO do tipo PointDTO vindos de "RequestBody",uriBuilder do tipo UriComponentsBuilder.
-#### A variável response è do tipo ResponseMessageStatus,recebe o método createPointService() vindo de service,passando pointDTO por argumento.
-#### A variável path é do tipo URI,e recebe o método path() de uriBuilder,passando o caminho até o id,acessa o método buildAndExpand() passando o id vindo de pointDTO como argumento,e acessando por fim o método toURI().
+#### A variável pointModel,é do tipo Point,recebe o método createPointService() vindo de service,passando pointDTO por argumento.
+#### A variável pointId,é do tipo Long,e recebe id de pointModel.
+#### A variável path é do tipo URI,e recebe o método path() de uriBuilder,passando o caminho até o id,acessa o método buildAndExpand() passando pointId como argumento,e acessando por fim o método toURI().
 #### Retorna o método created() vindo de ResponseEntity,passando path como argumento,e acessa o método body() passando como argumento response.
 
 <br>
