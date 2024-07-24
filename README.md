@@ -46,20 +46,37 @@
 ## Configs
 ### • ViacepConfig
 #### ▪ Tem somente um método,que retorna uma nova instância de RestTemplate,para receber os dados vindos da api do ViaCep.
-<br>
+<br><br>
 
 ### • Config
 #### ▪ Tem somente um método,que retorna uma nova instância de ModelMapper,para mapeamento dos dados.
-<br>
+<br><br>
 
 ### • Security
 #### ▪ O primeiro método é filterSecurity,do tipo SecurityFilterChain,recebe por parâmetro http do tipo HttpSecurity,e tem uma trow caso algo dê errado,do parâmetro http,acesso o método "csrf",e o desabilito,através do método "sessionManagement" digo que a sessão será do tipo stateless,e por fim é retornado http,realizando um build.
 #### ▪ O segundo método é passwordEncoder,do tipo PasswordEncoder,que retorna uma nova instância de BCryptPasswordEcoder.
 
-<br>
+<br><br>
 
 ### • SwaggerConfig
-#### ▪ Foi feito o uso da anotação "OpenAPIDefinition" para definir o titlo,descrição e versão no Swagger.
+#### ▪ Foi feito o uso da anotação "OpenAPIDefinition" para definir o titlo,descrição e versão no Swagger,e a seguraça requerida com nome de bearerAuth.
+#### ▪ Foi feito o uso da anotação "SecurityScheme",o nome,o tipo,o esquema,e o formato do bearer.
+
+<br><br>
+
+### • Filter
+#### **▪ doFilterInternal**
+##### A classe Filter é estendida por OncePerRequestFilter,por meio da herança tive que implementar o método doFilterInternal,na qual tem como parâmetros response,request e filterChain.
+##### A variável requestURI é do tipo String,e recebe o método geRequestURI() de request.É verificado se "/employee",ou "/login",ou "/enterprise" é igual a requestURI,ou "/swagger-ui/",ou "/v3/api-docs",ou "favicon.ico" é como começa a requestURI,se sim,através do ```filterChain.doFilter(request,response)``` que passa a requisição e a resposta para o próximo filtro na cadeia de filtros,e com o ```return``` paro a execução do método impedindo que qualquer linha abaixo seja executada. 
+##### No bloco try,a variável token,recebe o método findToken que passa request por argumento,é verificado se token é igual a null,se for é lançado uma nova exceção de NotFoundException,passando "Token" e 'o' como argumentos.Logo se não cair na condição,através do ```filterChain.doFilter(request,response)``` que passa a requisição e a resposta para o próximo filtro na cadeia de filtros,e com o ```return``` paro a execução do método impedindo que qualquer linha abaixo seja executada.
+##### No bloco catch,que captura a exceção NotFoundException,define o status em reponse para 404,define o tipo do conteúdo.A variável writer é do tipo PrintWriter,e obtém um PrintWriter da resposta da requisição,acessa o método write() de writer,passando uma resposta no formato json,e por fim acessa o método flush() de writer,forçando a saída dos dados de PrintWriter para HTTP.
+
+<br>
+
+#### **▪ findToken**
+##### O tipo de retorno é String,e recebe como parâmetro,request do tipo HttpServletRequest.
+##### É recuperado do cabeçalho o token através de Authorization,e é verificado se é null,se for é lançado uma exceção NotFoundException,passando "Token" e 'o' como argumento.
+##### Retorna o token,retirando através do método replace(),somente o "Bearer" que fica no início do token,e assim retorna o token.
 
 
 --------------------------------------------------------------
