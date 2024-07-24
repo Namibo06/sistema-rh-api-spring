@@ -1076,13 +1076,13 @@ public Page<EmployeeDTO> getAllEmployeeService(Pageable pageable){
 public EmployeeDTO getEmployeeByIdService(Long id){
     existsEmployee(id);
 
-    Employee employee = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+    Employee employee = repository.findById(id).orElseThrow(() -> new NotFoundException("Funcionário",'o'));
     return modelMapper.map(employee, EmployeeDTO.class);
 }
 ```
 #### O método é do tipo EmployeeDTO,e recebe como parâmetro id do tipo Long.
 #### Acessa  o método existsEmployee() e passa id como argumento.
-#### A variável employee é do tipo Employee,e recebe o método findById() de repository,passando id como argumento,acessa o método orElseThrow(),que lançará uma nova exceção EntityNotFoundException,com uma mensagem personalizada.
+#### A variável employee é do tipo Employee,e recebe o método findById() de repository,passando id como argumento,acessa o método orElseThrow(),que lançará uma nova exceção NotFoundException,com uma mensagem personalizada.
 #### Retorna um mapeamento de employee para EmployeeDTO.
 
 <br>
@@ -1092,7 +1092,7 @@ public EmployeeDTO getEmployeeByIdService(Long id){
 public ResponseMessageStatus updateEmployeeByIdService(Long id,EmployeeDTO employeeDTO){
     existsEmployee(id);
     
-    Employee employee = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+    Employee employee = repository.findById(id).orElseThrow(() -> new NotFoundException("Funcionário",'o'));
     employee.setFirstName(employeeDTO.getFirstName());
     employee.setLastName(employeeDTO.getLastName());
     employee.setDateNasciment(employeeDTO.getDateNasciment());
@@ -1113,7 +1113,7 @@ public ResponseMessageStatus updateEmployeeByIdService(Long id,EmployeeDTO emplo
 ```
 #### O método é do tipo ResponseMessageStatus,e recebe como parâmetros,id do tipo Long,e employeeDTO do tipo EmployeeDTO.
 #### Acessa o método existsEmployee(),passando id como argumento.
-#### A variável employee é do tipo Employee,e recebe o método  findById() de repository,passando id como argumento,acessa o método orElseThrow(),que lançará EntityNotFoundException com ma mensagem personalizada caso não encontre um registro no banco de dados.    
+#### A variável employee é do tipo Employee,e recebe o método  findById() de repository,passando id como argumento,acessa o método orElseThrow(),que lançará NotFoundException com ma mensagem personalizada caso não encontre um registro no banco de dados.    
 #### É setado em employee o firstName,lastName,dateNasciment,gender,sector,cep,cnpjEnterprise,userLevel,login,password e token,vindos de employeeDTO.Acessa o método save() de repository,passando employee como argumento.
 #### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status do tipo Integer,recebe valores personalizados.Retorna uma nova instância de ResponseMessageStatus,passando como argumentos,message e status.
 
@@ -1139,13 +1139,13 @@ public void existsEmployee(Long id){
     boolean existsEmployeeById = repository.existsById(id);
 
     if(!existsEmployeeById){
-        throw new EntityNotFoundException("Funcionário não encontrado");
+        throw new NotFoundException("Funcionário",'o');
     }
 }
 ```
 #### O método não tem retorno,e recebe como parâmetro id do tipo Long.
 #### A variável existsEmployeeById é do tipo boolean,e recebe o método existsById() de repository,passando id como argumento. 
-#### E verificado se o retorno de existsEmployeeById é false,se for,lançará uma nova exceção EntityNotFoundException,com uma mensagem personalizada.
+#### E verificado se o retorno de existsEmployeeById é false,se for,lançará uma nova exceção NotFoundException,com uma mensagem personalizada.
 
 <br>
 
@@ -1619,14 +1619,22 @@ public ResponseEntity<ResponseMessageStatus> verifyAddress(@RequestBody String c
 #### • createEmployee - POST
 ```
 public ResponseEntity<ResponseMessageStatus> createEmployee(@RequestBody EmployeeDTO employee, UriComponentsBuilder uriBuilder){
-   ResponseMessageStatus response = service.createEmployeeService(employee);
-   URI path = uriBuilder.path("/employee/{id}").buildAndExpand(employee.getId()).toUri();
-   return ResponseEntity.created(path).body(response);
-}
+        EmployeeDTO employeeDTO = service.createEmployeeService(employee);
+        Long employeeId = employeeDTO.getId();
+        URI path = uriBuilder.path("/employee/{id}").buildAndExpand(employeeId).toUri();
+
+        String message="Funcionário criado com sucesso";
+        Integer status=201;
+        ResponseMessageStatus response = new ResponseMessageStatus(message,status);
+
+       return ResponseEntity.created(path).body(response);
+    }
 ```
 #### O método é do tipo ResponseEntity<ResponseMessageStatus>,e recebe como parãmetros,employee do tipo EmployeeDTO vindos de "RequestBody",uriBuilder do tipo UriComponentsBuilder.
-#### A variável response è do tipo ResponseMessageStatus,recebe o método createEmployeeService() vindo de service,passando employee por argumento.
-#### A variável path é do tipo URI,e recebe o método path() de uriBuilder,passando o caminho até o id,acessa o método buildAndExpand() passando o id vindo de employee como argumento,e acessando por fim o método toURI().
+#### A variável employeeDTO é do tipo EmployeeDTO,recebe o método createEmployeeService() vindo de service,passando employee por argumento.
+#### A variável employeeId é do tipo Long,recebe id de employeeDTO.
+#### A variável path é do tipo URI,e recebe o método path() de uriBuilder,passando o caminho até o id,acessa o método buildAndExpand() passando employeeId como argumento,e acessando por fim o método toURI().
+#### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status é do tipo Integer,e recebe um valor personalizado.A variável response é do tipo ResponseMessageStatus,e recebe uma nova instância de ResponseMessageStatus,passando message e status como argumento.
 #### Retorna o método created() vindo de ResponseEntity,passando path como argumento,e acessa o método body() passando como argumento response. 
 
 <br>
