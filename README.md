@@ -58,6 +58,10 @@
 
 <br>
 
+### • SwaggerConfig
+#### ▪ Foi feito o uso da anotação "OpenAPIDefinition" para definir o titlo,descrição e versão no Swagger.
+
+
 --------------------------------------------------------------
 
 ## Models
@@ -1714,9 +1718,9 @@ public ResponseEntity<Void> deletePointById(@PathVariable Long id){
 #### Acessa o método deletePointById() de service,passando como argumento id.
 #### Retorna o método noContent() de ResponseEntity,e depois acessa o método build().
 
+---------------------------------------------------------------------------------------
+### Link para o Swagger
+[swagger](http://localhost:8080/swagger-ui/index.html#/)
 
-[link para o swagger](http://localhost:8080/swagger-ui/index.html#/)
-
-// implementar o swagger
 // fazer login do funcionario,e deixar rotas restritas através do security
 // fazer consultas select com join para trazer os dados de userLevel por exemplo,trazendo o nome em vez do numero,no caso criar DTO's personalizados pra retornar essas buscas nos métodos GET
