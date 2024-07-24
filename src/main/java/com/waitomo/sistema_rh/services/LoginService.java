@@ -6,9 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.waitomo.sistema_rh.dtos.EmployeeDTO;
-import com.waitomo.sistema_rh.dtos.LoginResponseDTO;
-import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
+import com.waitomo.sistema_rh.dtos.*;
 import com.waitomo.sistema_rh.models.Employee;
 import com.waitomo.sistema_rh.repositories.EmployeeRepository;
 import com.waitomo.sistema_rh.repositories.SectorRepository;
@@ -36,16 +34,22 @@ public class LoginService {
     @Autowired
     private PasswordEncoder encoder;
 
-    public String createToken(){
+    public TokenResponseDTO createToken(){
         try{
             Date now = new Date();
             Date expirationDate = new Date(now.getTime() + 3600 * 1000 * 3);
             Algorithm algorithm = Algorithm.HMAC256("WaitomoHiper12çCorporation");
 
-            return JWT.create()
+            String token = JWT.create()
                     .withIssuer("Sistema RH")
                     .withExpiresAt(expirationDate)
                     .sign(algorithm);
+
+            String message = "Login realizado e token criado";
+            Integer status = 201;
+
+            return new TokenResponseDTO(token,message,status);
+
         }catch (JWTCreationException e){
             throw new RuntimeException("Falha ao criar token: "+e);
         }
@@ -70,7 +74,7 @@ public class LoginService {
         }
     }
 
-    public ResponseMessageStatus updateTokenByUser(String login, String token){
+    public ResponseMessageStatus updateTokenByUser(String login, TokenResponseDTO token){
         Optional<Employee> employee = repository.findByLogin(login);
         if (employee.isEmpty()) {
             throw new EntityNotFoundException("Funcionário não encontrado");
@@ -78,11 +82,11 @@ public class LoginService {
 
         Employee employeeModel = employee.get();
 
-        if(token.isEmpty()){
+        if(token.getToken().isEmpty()){
             throw new IllegalArgumentException("Token nulo ou vazio");
         }
 
-        employeeModel.setToken(token);
+        employeeModel.setToken(token.getToken());
         repository.save(employeeModel);
 
         String message = "Token criado e atualizado com sucesso";
