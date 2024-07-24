@@ -1619,20 +1619,20 @@ public ResponseEntity<ResponseMessageStatus> verifyAddress(@RequestBody String c
 #### • createEmployee - POST
 ```
 public ResponseEntity<ResponseMessageStatus> createEmployee(@RequestBody EmployeeDTO employee, UriComponentsBuilder uriBuilder){
-        EmployeeDTO employeeDTO = service.createEmployeeService(employee);
-        Long employeeId = employeeDTO.getId();
-        URI path = uriBuilder.path("/employee/{id}").buildAndExpand(employeeId).toUri();
+    Employee employeeModel = service.createEmployeeService(employee);
+    Long employeeId = employeeModel.getId();
+    URI path = uriBuilder.path("/employee/{id}").buildAndExpand(employeeId).toUri();
 
-        String message="Funcionário criado com sucesso";
-        Integer status=201;
-        ResponseMessageStatus response = new ResponseMessageStatus(message,status);
+    String message="Funcionário criado com sucesso";
+    Integer status=201;
+    ResponseMessageStatus response = new ResponseMessageStatus(message,status);
 
-       return ResponseEntity.created(path).body(response);
-    }
+    return ResponseEntity.created(path).body(response);
+}
 ```
 #### O método é do tipo ResponseEntity<ResponseMessageStatus>,e recebe como parãmetros,employee do tipo EmployeeDTO vindos de "RequestBody",uriBuilder do tipo UriComponentsBuilder.
-#### A variável employeeDTO é do tipo EmployeeDTO,recebe o método createEmployeeService() vindo de service,passando employee por argumento.
-#### A variável employeeId é do tipo Long,recebe id de employeeDTO.
+#### A variável employeeModel é do tipo Employee,recebe o método createEmployeeService() vindo de service,passando employee por argumento.
+#### A variável employeeId é do tipo Long,recebe id de employeeModel.
 #### A variável path é do tipo URI,e recebe o método path() de uriBuilder,passando o caminho até o id,acessa o método buildAndExpand() passando employeeId como argumento,e acessando por fim o método toURI().
 #### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status é do tipo Integer,e recebe um valor personalizado.A variável response é do tipo ResponseMessageStatus,e recebe uma nova instância de ResponseMessageStatus,passando message e status como argumento.
 #### Retorna o método created() vindo de ResponseEntity,passando path como argumento,e acessa o método body() passando como argumento response. 
