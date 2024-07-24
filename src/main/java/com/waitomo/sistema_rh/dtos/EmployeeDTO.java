@@ -17,7 +17,6 @@ import java.util.Date;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class EmployeeDTO{
-    private Long id;
     private String firstName;
     private String lastName;
     private LocalDate dateNasciment;
