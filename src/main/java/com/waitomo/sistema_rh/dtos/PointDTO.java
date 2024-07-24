@@ -8,7 +8,6 @@ import java.time.LocalTime;
 @Getter
 @Setter
 public class PointDTO{
-    private Long id;
     private Long employeeId;
     private LocalDate date;
     private LocalTime checkInTime;
