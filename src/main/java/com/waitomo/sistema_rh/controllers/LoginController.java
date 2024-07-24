@@ -3,8 +3,10 @@ package com.waitomo.sistema_rh.controllers;
 import com.waitomo.sistema_rh.dtos.LoginResponseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.dtos.TokenResponse;
+import com.waitomo.sistema_rh.dtos.TokenResponseDTO;
 import com.waitomo.sistema_rh.services.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ public class LoginController {
 
     @PostMapping
     @Operation(summary = "Realizar login")
-    public ResponseEntity<ResponseMessageStatus> login(@RequestBody LoginResponseDTO credentials){
+    public ResponseEntity<TokenResponseDTO> login(@RequestBody LoginResponseDTO credentials){
         try {
 
             boolean existsEmployee=service.findEmployeeByLoginAndPassword(credentials);
@@ -26,21 +28,21 @@ public class LoginController {
                 throw new EntityNotFoundException("Funcionário não encontrado");
             }
 
-            String tokenCreated = service.createToken();
+            TokenResponseDTO tokenCreated = service.createToken();
 
-            ResponseMessageStatus response = service.updateTokenByUser(credentials.login(),tokenCreated);
-            return ResponseEntity.ok(response);
+            service.updateTokenByUser(credentials.login(),tokenCreated);
+            return ResponseEntity.ok(tokenCreated);
         }catch (Exception e){
             String message=e.getMessage();
-            Integer status = 404;
+            Integer status = 400;
 
-            ResponseMessageStatus response = new ResponseMessageStatus(message,status);
+            TokenResponseDTO response = new TokenResponseDTO("",message,status);
             return ResponseEntity.ok(response);
         }
     }
 
     @PostMapping("/token/{id}")
-    @Operation(summary = "Validar token")
+    @Operation(summary = "Validar token",security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id, @RequestBody TokenResponse tokenResponse){
         ResponseMessageStatus response = service.verifyToken(id,tokenResponse.token());
 
