@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EmployeeService {
     @Autowired
@@ -52,9 +54,13 @@ public class EmployeeService {
     }
 
     public Page<EmployeeDTO> getAllEmployeeService(Pageable pageable){
-        return repository
-                .findAll(pageable)
-                .map(employee -> modelMapper.map(employee, EmployeeDTO.class));
+        Page<Employee> employeeDTOList = repository.findAll(pageable);
+
+        if(employeeDTOList.isEmpty()){
+            throw new NotFoundException("Funcionários",'o');
+        }
+
+        return employeeDTOList.map(employee -> modelMapper.map(employee, EmployeeDTO.class));
     }
 
     public EmployeeDTO getEmployeeByIdService(Long id){
