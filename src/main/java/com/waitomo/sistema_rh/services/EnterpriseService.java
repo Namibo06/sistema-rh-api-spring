@@ -1,6 +1,7 @@
 package com.waitomo.sistema_rh.services;
 
 import com.waitomo.sistema_rh.dtos.*;
+import com.waitomo.sistema_rh.exceptions.BadRequestException;
 import com.waitomo.sistema_rh.exceptions.NotFoundException;
 import com.waitomo.sistema_rh.models.EmployeeAddress;
 import com.waitomo.sistema_rh.models.Enterprise;
@@ -48,10 +49,10 @@ public class EnterpriseService {
 
         enterpriseModel.setCnpj(enterprise.getCnpj());
         if(enterpriseModel.getCnpj() == null || enterpriseModel.getCnpj().isEmpty()){
-            throw  new IllegalArgumentException("O campo de CNPJ não pode ser nulo ou vazio");
+            throw  new BadRequestException("O campo de CNPJ não pode ser nulo ou vazio");
         }
         if(enterpriseModel.getCnpj().length() != 14){
-            throw new IllegalArgumentException("O campo de CNPJ precisa conter 14 caracteres");
+            throw new BadRequestException("O campo de CNPJ precisa conter 14 caracteres");
         }
 
         enterpriseModel.setFantasy_name(enterprise.getFantasy_name());
