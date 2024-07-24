@@ -2,6 +2,7 @@ package com.waitomo.sistema_rh.controllers;
 
 import com.waitomo.sistema_rh.dtos.PointDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
+import com.waitomo.sistema_rh.models.Point;
 import com.waitomo.sistema_rh.services.PointService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,17 @@ public class PointController {
     @Autowired
     private PointService service;
 
+    final static String MESSAGE_CREATED = "Ponto criado com sucesso!";
+    final static Integer STATUS_CREATED = 201;
+
     @PostMapping
     @Operation(summary = "Criar ponto")
     public ResponseEntity<ResponseMessageStatus> createPoint(@RequestBody PointDTO pointDTO, UriComponentsBuilder uriBuilder){
-        ResponseMessageStatus response = service.createPointService(pointDTO);
-        URI path = uriBuilder.path("/point/{id}").buildAndExpand(pointDTO.getId()).toUri();
+        Point pointModel = service.createPointService(pointDTO);
+        Long pointId = pointModel.getId();
+        URI path = uriBuilder.path("/point/{id}").buildAndExpand(pointId).toUri();
+
+        ResponseMessageStatus response = new ResponseMessageStatus(MESSAGE_CREATED,STATUS_CREATED);
 
         return ResponseEntity.created(path).body(response);
     }
