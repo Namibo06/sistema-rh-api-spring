@@ -30,7 +30,7 @@ public class EmployeeService {
     @Autowired
     private PasswordEncoder encoder;
 
-    public EmployeeDTO createEmployeeService(EmployeeDTO employeeDTO){
+    public Employee createEmployeeService(EmployeeDTO employeeDTO){
         Employee employeeModel = modelMapper.map(employeeDTO, Employee.class);
 
         employeeModel.setFirstName(employeeDTO.getFirstName());
@@ -48,7 +48,7 @@ public class EmployeeService {
 
         updateNumberEmployee(employeeDTO.getCnpjEnterprise());
 
-        return modelMapper.map(employeeModel,EmployeeDTO.class);
+        return employeeModel;
     }
 
     public Page<EmployeeDTO> getAllEmployeeService(Pageable pageable){
