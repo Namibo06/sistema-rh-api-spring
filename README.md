@@ -241,16 +241,29 @@ public ResponseEntity<ErrorResponseDTO> handleNotFoundException(NotFoundExceptio
 #### A variável errorResponse do tipo ErrorResponseDTO,recebe uma nova instância de ErrorResponseDTO,e passa o método getMessage() de ex,e uma mensagem como argumento.
 #### Retorna uma nova instância de ResponseEntity,passando errorResponse e a propriedade NOT_FOUND de HttpStatus como argumento.  
 
+<br>
+
+#### • handleBadRequestException
+```
+public ResponseEntity<ErrorResponseDTO> handleBadRequestException(BadRequestException ex){
+    ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(), "Erro na requisição");
+    return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
+}
+```
+#### O método é do tipo ResponseEntity<ErrorResponseDTO>,recebe como parâmetro ex do tipo BadRequestException.
+#### A variável errorResponse do tipo ErrorResponseDTO,recebe uma nova instância de ErrorResponseDTO,e passa o método getMessage() de ex,e uma mensagem como argumento.
+#### Retorna uma nova instância de ResponseEntity,passando errorResponse e a propriedade BAD_REQUEST de HttpStatus como argumento.
+
 
 <br><br>
 
 ### NotFoundException
 #### Estende de RuntimeException,recebe um construtor,com parâmetros,className do tipo String,e sufix do tipo Character,acessa o método super na qual irá receber uma mensagem personalizada. 
-```
-public NotFoundException(String className,Character sufix){
-    super(className+ " não encontrad" +sufix);
-}
-```
+
+<br>
+
+### BadRequestException
+#### Estende de RuntimeException,recebe um construtor,com um parâmetro,message do tipo String,acessa o método super na qual irá receber uma mensagem personalizada.
 
 
 --------------------------------------------------------------
@@ -451,10 +464,10 @@ public EnterpriseDTO createEnterpriseService(EnterpriseDTO enterprise){
     
     enterpriseModel.setCnpj(enterprise.getCnpj());
     if(enterpriseModel.getCnpj() == null || enterpriseModel.getCnpj().isEmpty()){
-        throw  new IllegalArgumentException("O campo de CNPJ não pode ser nulo ou vazio");
+        throw  new BadRequestException("O campo de CNPJ não pode ser nulo ou vazio");
     }
     if(enterpriseModel.getCnpj().length() != 14){
-        throw new IllegalArgumentException("O campo de CNPJ precisa conter 14 caracteres");
+        throw new BadRequestException("O campo de CNPJ precisa conter 14 caracteres");
     }
     
     enterpriseModel.setFantasy_name(enterprise.getFantasy_name());
@@ -487,7 +500,7 @@ public EnterpriseDTO createEnterpriseService(EnterpriseDTO enterprise){
 ```
 #### O método retorna o tipo EnterpriseDTO,tem parâmetro,enterprise do tipo EnterpriseDTO
 #### A variável enterpriseModel do tipo Enterprise,recebe uma nova instância de Enterprise
-#### Seto em enterpriseModel o cnpj,como argumento recupero o cnpj de enterprise.É verificado abaixo se cnpj é vazio ou nulo,que aí é lançada uma exceção IllegalArgumentException com uma mensagem personalizada.É verificado logo abaixo também se o tamanho do cpj é diferente de 14,se for,,é lançada uma exceção IllegalArgumentException com uma mensagem personalizada.
+#### Seto em enterpriseModel o cnpj,como argumento recupero o cnpj de enterprise.É verificado abaixo se cnpj é vazio ou nulo,que aí é lançada uma exceção BadRequestException com uma mensagem personalizada.É verificado logo abaixo também se o tamanho do cpj é diferente de 14,se for,,é lançada uma exceção BadRequestException com uma mensagem personalizada.
 #### É setado em enterpriseModel,o fantasy name,passando como argumento fantasy name vindo de enterprise.É setado em enterpriseModel,a company name,passando como argumento company name vindo de enterprise.É setado em enterpriseModel,o number employees,passando como argumento number employees vindo de enterprise.A variável enterpriseCreated do tipo Enterprise,recebe o método save() do enterpriseRepository na qual passa como argumento enterpriseModel.
 #### A variável idUserLevelDTO é do tipo Long,recebe o método createUserLevelByEnterprise(),passando o id vindo de enterpriseCreated.A variável idSectorDTO é do tipo Long,recebe o método createSectorByEnterprise(),passando o id vindo de enterpriseCreated.A variável cepDefault é do tipo String e recebe um cep padrão.
 #### A variável employeeDTO,é do tipo EmployeeDTO,e recebe uma nova instâcia de EmployeeDTO acompanhado dos seguites parâmetros: id = null, firstame = "root", lastName = null, dateNasciment = LocalDate.of(2003,10,06), gender = "others", sector = idSectorDTO, cep = cepDefault, cnpjEnterprise = enterpriseCreated.getCnpj(), userLevel = idUserLevelDTO, login = enterpriseCreated.getCnpj().concat("root"), password = "123", token = null.Logo após acesso o método createEmployeeService() de employeeService passando employeeDTO como argumento.
