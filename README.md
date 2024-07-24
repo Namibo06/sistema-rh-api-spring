@@ -504,6 +504,11 @@ public ResponseMessageStatus createEnterpriseService(EnterpriseDTO enterprise){
 #### • findAllEnterprises
 ```
 public Page<EnterpriseDTO> findAllEnterprises(Pageable pageable){
+    List<Enterprise> enterprises = enterpriseRepository.findAll();
+    if(enterprises.isEmpty()){
+        throw new NotFoundException("Empresas",'a');
+    }
+
     return enterpriseRepository
             .findAll(pageable)
             .map(enterprise ->
@@ -512,6 +517,7 @@ public Page<EnterpriseDTO> findAllEnterprises(Pageable pageable){
 }
 ```
 #### O método retorna Page<EnterpriseDTO>,e recebe como parâmetro,pageable do tipo Pageable.
+#### A variável enterprises,é do tipo List<Enterprise>,e recebe o método findAll() de enterpriseRepository,é verificado se enterprises é vazio,se for é lançada uma nova exceção de NotFoundException,passando "Empresas" e 'a' como argumento. 
 #### O retorno é o método findAll() acesso por enterpriseRepository,passando como argumento pageable,acessando método map,passando como parâmetro enterprise e realizando um mapeamento de dados de enterprise para EnterpriseDTO.
 
 <br>
@@ -1307,24 +1313,24 @@ public ResponseEntity<ResponseMessageStatus> login(@RequestBody LoginResponseDTO
             throw new EntityNotFoundException("Funcionário não encontrado");
         }
 
-        String tokenCreated = service.createToken();
+        TokenResponseDTO tokenCreated = service.createToken();
 
-        ResponseMessageStatus response = service.updateTokenByUser(credentials.login(),tokenCreated);
-        return ResponseEntity.ok(response);
+        service.updateTokenByUser(credentials.login(),tokenCreated);
+        return ResponseEntity.ok(tokenCreated);
     }catch (Exception e){
         String message=e.getMessage();
-        Integer status = 404;
+        Integer status = 400;
 
-        ResponseMessageStatus response = new ResponseMessageStatus(message,status);
+        TokenResponseDTO response = new TokenResponseDTO("",message,status);
         return ResponseEntity.ok(response);
     }
 }
 ```
 #### O método retorna ResponseEntity<ResponseMessageStatus> e recebe por parâmetro,credentials do tipo LoginResposeDTO pela anotação "@RequestBody".
 #### No bloco try,a variável existsEmployee,é do tipo boolean,,e recebe o método findEmployeeByLoginAndPassword() da service,passando como argumento credentials.É verificado se o retorno de existsEmployee for false,é lançada uma exceção EntityNotFoundException com uma mensagem personalizada
-#### A variável tokeCreated,é do tipo String,e retorna o método createToken() da service.A variável response do tipo ResponseMessageStatus,recebe o método updateTokenByUser() da service passando como parâmetro,o loginde credentials,e a variável tokenCreated que contém o token.Retorna o método ok() de ResponseEntity,passando como argumento a variável response. 
-#### No bloco catch que espera uma exceçãodo tipo Exception.
-#### A variável message,é do tipo String,e recebe uma mensagem personalizada,a variável status é do tipo Integer,e recebe um valor personalizado,a variável response é do tipo ResponseMessageStatus,e recebe uma nova instância de ResponseMessageStatu,passando como argumento message e status.
+#### A variável tokeCreated,é do tipo TokenResponseDTO,e retorna o método createToken() da service.É acessado o método updateTokenByUser() da service passando como parâmetro,o loginde credentials,e a variável tokenCreated que contém o token.Retorna o método ok() de ResponseEntity,passando como argumento a variável tokenCreated. 
+#### No bloco catch que espera uma exceção do tipo Exception.
+#### A variável message,é do tipo String,e recebe uma mensagem personalizada,a variável status é do tipo Integer,e recebe um valor personalizado,a variável response é do tipo TokenResponseDTO,e recebe uma nova instância de ResponseMessageStatu,passando como argumento um campo vazio,message e status.
 #### O catch retorna o método ok() de ResponseEntity,passando como argumento a variável response.
 
 <br>
@@ -1741,8 +1747,45 @@ public ResponseEntity<Void> deletePointById(@PathVariable Long id){
 #### Retorna o método noContent() de ResponseEntity,e depois acessa o método build().
 
 ---------------------------------------------------------------------------------------
+
 ### Link para o Swagger
 [swagger](http://localhost:8080/swagger-ui/index.html#/)
 
-// fazer login do funcionario,e deixar rotas restritas através do security
+---------------------------------------------------------------------------------------
+
+## Retornos para o Swagger
+### Valores meramente ilustrativos
+
+<br>
+
+### Enterprise | createEnterprise
+```
+{
+    "cnpj":"29973118736421",
+    "fantasy_name":"teste3",
+    "company_name":"teste3",
+    "number_employees":"0"
+}
+```
+
+<br>
+
+### Enterprise | getAllEnterprises
+```
+{
+  "page": 0,
+  "size": 1,
+  "sort": [
+
+  ]
+}
+```
+
+<br>
+
+
+
+// adicionar no findAll dos services,além de enterprises,uma verificação
+// adicionar mais exceptions
+// mudar tokenResponse para tokenRequest
 // fazer consultas select com join para trazer os dados de userLevel por exemplo,trazendo o nome em vez do numero,no caso criar DTO's personalizados pra retornar essas buscas nos métodos GET
