@@ -2,6 +2,7 @@ package com.waitomo.sistema_rh.services;
 
 import com.waitomo.sistema_rh.dtos.PointDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
+import com.waitomo.sistema_rh.exceptions.NotFoundException;
 import com.waitomo.sistema_rh.models.Point;
 import com.waitomo.sistema_rh.repositories.EmployeeRepository;
 import com.waitomo.sistema_rh.repositories.PointRepository;
@@ -42,8 +43,13 @@ public class PointService {
     }
 
     public Page<PointDTO> getAllPointService(Pageable pageable){
-        return repository
-                .findAll(pageable)
+        Page<Point> pointPage = repository.findAll(pageable);
+
+        if(pointPage.isEmpty()){
+            throw new NotFoundException("Pontos",'o');
+        }
+
+        return pointPage
                 .map(point -> modelMapper.map(point, PointDTO.class));
     }
 
