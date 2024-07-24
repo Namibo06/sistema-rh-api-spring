@@ -14,4 +14,10 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(),"Registro não encontrado");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBadRequestException(BadRequestException ex){
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(), "Erro na requisição");
+        return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
+    }
 }
