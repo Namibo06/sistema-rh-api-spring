@@ -446,9 +446,9 @@ public boolean findEmployeeByLoginAndPassword(LoginResponseDTO credentials){
 
 #### • createEnterpriseService
 ```
-public ResponseMessageStatus createEnterpriseService(EnterpriseDTO enterprise){
+public EnterpriseDTO createEnterpriseService(EnterpriseDTO enterprise){
     Enterprise enterpriseModel = new Enterprise();
-
+    
     enterpriseModel.setCnpj(enterprise.getCnpj());
     if(enterpriseModel.getCnpj() == null || enterpriseModel.getCnpj().isEmpty()){
         throw  new IllegalArgumentException("O campo de CNPJ não pode ser nulo ou vazio");
@@ -456,17 +456,17 @@ public ResponseMessageStatus createEnterpriseService(EnterpriseDTO enterprise){
     if(enterpriseModel.getCnpj().length() != 14){
         throw new IllegalArgumentException("O campo de CNPJ precisa conter 14 caracteres");
     }
-
+    
     enterpriseModel.setFantasy_name(enterprise.getFantasy_name());
     enterpriseModel.setCompany_name(enterprise.getCompany_name());
     enterpriseModel.setNumber_employees(enterprise.getNumber_employees());
-
+    
     Enterprise enterpriseCreated=enterpriseRepository.save(enterpriseModel);
-
+    
     Long idUserLevelDTO=createUserLevelByEnterprise(enterpriseCreated.getId());
     Long idSectorDTO = createSectorByEnterprise(enterpriseCreated.getId());
     String cepDefault = "44095400";
-
+    
     EmployeeDTO employeeDTO = new EmployeeDTO(
             null,
             "root",
@@ -481,23 +481,17 @@ public ResponseMessageStatus createEnterpriseService(EnterpriseDTO enterprise){
             "123",
             null);
     employeeService.createEmployeeService(employeeDTO);
-
-    String message="Empresa criada com sucesso!";
-    Integer status = 201;
-
-    return new ResponseMessageStatus(
-            message,
-            status
-    );
+    
+    return modelMapper.map(enterpriseModel,EnterpriseDTO.class);
 }
 ```
-#### O método retorna o tipo ResponseMessageStatus,tem parâmetro,enterprise do tipo EnterpriseDTO
+#### O método retorna o tipo EnterpriseDTO,tem parâmetro,enterprise do tipo EnterpriseDTO
 #### A variável enterpriseModel do tipo Enterprise,recebe uma nova instância de Enterprise
 #### Seto em enterpriseModel o cnpj,como argumento recupero o cnpj de enterprise.É verificado abaixo se cnpj é vazio ou nulo,que aí é lançada uma exceção IllegalArgumentException com uma mensagem personalizada.É verificado logo abaixo também se o tamanho do cpj é diferente de 14,se for,,é lançada uma exceção IllegalArgumentException com uma mensagem personalizada.
 #### É setado em enterpriseModel,o fantasy name,passando como argumento fantasy name vindo de enterprise.É setado em enterpriseModel,a company name,passando como argumento company name vindo de enterprise.É setado em enterpriseModel,o number employees,passando como argumento number employees vindo de enterprise.A variável enterpriseCreated do tipo Enterprise,recebe o método save() do enterpriseRepository na qual passa como argumento enterpriseModel.
 #### A variável idUserLevelDTO é do tipo Long,recebe o método createUserLevelByEnterprise(),passando o id vindo de enterpriseCreated.A variável idSectorDTO é do tipo Long,recebe o método createSectorByEnterprise(),passando o id vindo de enterpriseCreated.A variável cepDefault é do tipo String e recebe um cep padrão.
 #### A variável employeeDTO,é do tipo EmployeeDTO,e recebe uma nova instâcia de EmployeeDTO acompanhado dos seguites parâmetros: id = null, firstame = "root", lastName = null, dateNasciment = LocalDate.of(2003,10,06), gender = "others", sector = idSectorDTO, cep = cepDefault, cnpjEnterprise = enterpriseCreated.getCnpj(), userLevel = idUserLevelDTO, login = enterpriseCreated.getCnpj().concat("root"), password = "123", token = null.Logo após acesso o método createEmployeeService() de employeeService passando employeeDTO como argumento.
-#### A variável message,é do tipo String,e recebe uma mensagem personalizada.A variável status,é do tipo Integer,e recebe um valor personalizado.O retorno é uma nova instância de ResponseMessageStatus,passando como argumentos,message e status. 
+#### O retorno é um mapeamento de enterpriseModel para EnterpriseDTO.
 
 <br>
 
@@ -1356,16 +1350,26 @@ public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id
 #### • createEnterprise - POST
 ```
 public ResponseEntity<ResponseMessageStatus> createEnterprise(@RequestBody EnterpriseDTO enterprise, UriComponentsBuilder uriBuilder){
-    ResponseMessageStatus enterpriseDTO=enterpriseService.createEnterpriseService(enterprise);
-    URI path = uriBuilder.path("/enterprises/{id}").buildAndExpand(enterprise.getId()).toUri();
+        EnterpriseDTO enterpriseDTO=enterpriseService.createEnterpriseService(enterprise);
+        Long enterpriseId = enterpriseDTO.getId();
+        URI path = uriBuilder.path("/enterprises/{id}").buildAndExpand(enterpriseId).toUri();
 
-    return ResponseEntity.created(path).body(enterpriseDTO);
-}
+        String message="Empresa criada com sucesso!";
+        Integer status = 201;
+        ResponseMessageStatus response = new ResponseMessageStatus(
+                message,
+                status
+        );
+
+        return ResponseEntity.created(path).body(response);
+    }
 ```
 #### O método retorna ResponseEntity<ResponseMessageStatus>,recebe como parâmetros enterprise do tipo EnterpriseDTO pela anotação "RequestBody",e uriBuilder do tipo UriComponentsBuilder.
-#### A variável enterpriseDTO,é do tipo ResponseMessageStatus,acessa o método createEnterpriseService() de enterpriseService,passando como argumento enterprise.
-#### A variável path,é do tipo URI,e acessa o método path() de uriBuilder,passando como argumento o caminho até o id,acessa o método buildAndExpand,passando como argumento o id que é recuperado de enterprise,e acessa por fim o método toUri(). 
-#### Retorna o método created() de ResponseEntity,passando como argumento a variável path,acessa o método body() passando como argumento a variável enterpriseDTO. 
+#### A variável enterpriseDTO,é do tipo EnterpriseDTO,acessa o método createEnterpriseService() de enterpriseService,passando como argumento enterprise.
+#### A variável enterpriseId,é do tipo Long,recebe o id de enterpriseDTO.
+#### A variável path,é do tipo URI,e acessa o método path() de uriBuilder,passando como argumento o caminho até o id,acessa o método buildAndExpand,passando como argumento enterpriseId,e acessa por fim o método toUri().
+#### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status é do tipo Integer,e recebe um valor personalizado.A variável response é do tipo ResponseMessageStatus,e recebe uma nova instância de ResponseMessageStatus,passando message e status como argumento.   
+#### Retorna o método created() de ResponseEntity,passando como argumento a variável path,acessa o método body() passando como argumento a variável response. 
 
 <br>
 
