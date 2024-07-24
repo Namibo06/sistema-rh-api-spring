@@ -1,5 +1,6 @@
 package com.waitomo.sistema_rh.controllers;
 
+import com.waitomo.sistema_rh.dtos.EmployeeDTO;
 import com.waitomo.sistema_rh.dtos.EnterpriseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.services.EnterpriseService;
@@ -25,10 +26,18 @@ public class EnterpriseController {
     @PostMapping
     @Operation(summary = "Criar empresa")
     public ResponseEntity<ResponseMessageStatus> createEnterprise(@RequestBody EnterpriseDTO enterprise, UriComponentsBuilder uriBuilder){
-        ResponseMessageStatus enterpriseDTO=enterpriseService.createEnterpriseService(enterprise);
-        URI path = uriBuilder.path("/enterprises/{id}").buildAndExpand(enterprise.getId()).toUri();
+        EnterpriseDTO enterpriseDTO=enterpriseService.createEnterpriseService(enterprise);
+        Long enterpriseId = enterpriseDTO.getId();
+        URI path = uriBuilder.path("/enterprises/{id}").buildAndExpand(enterpriseId).toUri();
 
-        return ResponseEntity.created(path).body(enterpriseDTO);
+        String message="Empresa criada com sucesso!";
+        Integer status = 201;
+        ResponseMessageStatus response = new ResponseMessageStatus(
+                message,
+                status
+        );
+
+        return ResponseEntity.created(path).body(response);
     }
 
     @GetMapping
