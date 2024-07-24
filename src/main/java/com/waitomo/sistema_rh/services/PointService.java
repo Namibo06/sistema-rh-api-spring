@@ -26,7 +26,7 @@ public class PointService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public ResponseMessageStatus createPointService(PointDTO pointDTO){
+    public Point createPointService(PointDTO pointDTO){
         Point pointModel = modelMapper.map(pointDTO, Point.class);
 
         pointModel.setEmployeeId(pointDTO.getEmployeeId());
@@ -38,9 +38,7 @@ public class PointService {
 
         repository.save(pointModel);
 
-        String message = "Ponto criado com sucesso!";
-        Integer status=201;
-        return new ResponseMessageStatus(message,status);
+        return pointModel;
     }
 
     public Page<PointDTO> getAllPointService(Pageable pageable){
