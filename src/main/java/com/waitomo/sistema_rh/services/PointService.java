@@ -56,14 +56,14 @@ public class PointService {
     public PointDTO getPointByIdService(Long id){
         existsPoint(id);
 
-        Point point = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ponto não encontrado"));
+        Point point = repository.findById(id).orElseThrow(() -> new NotFoundException("Ponto",'o'));
         return modelMapper.map(point, PointDTO.class);
     }
 
     public ResponseMessageStatus updatePointByIdService(Long id,PointDTO pointDTO){
         existsPoint(id);
 
-        Point point = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ponto não encontrado"));
+        Point point = repository.findById(id).orElseThrow(() -> new NotFoundException("Ponto",'o'));
         point.setEmployeeId(pointDTO.getEmployeeId());
         point.setDate(pointDTO.getDate());
         point.setCheckInTime(pointDTO.getCheckInTime());
@@ -87,7 +87,7 @@ public class PointService {
         boolean existsPoint = repository.existsById(id);
 
         if(!existsPoint){
-            throw new EntityNotFoundException("Ponto não encontrado");
+            throw new NotFoundException("Ponto",'o');
         }
     }
 
@@ -95,7 +95,7 @@ public class PointService {
        boolean existsEmployee = employeeRepository.existsById(id);
 
        if(!existsEmployee){
-           throw new EntityNotFoundException("ID do Funcionário não encontrado");
+           throw new NotFoundException("ID do Funcionário",'o');
        }
     }
 }
