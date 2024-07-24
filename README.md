@@ -1029,8 +1029,9 @@ public boolean existAddress(String cep){
 
 #### • createEmployeeService
 ```
-public ResponseMessageStatus createEmployeeService(EmployeeDTO employeeDTO){
+public Employee createEmployeeService(EmployeeDTO employeeDTO){
     Employee employeeModel = modelMapper.map(employeeDTO, Employee.class);
+    
     employeeModel.setFirstName(employeeDTO.getFirstName());
     employeeModel.setLastName(employeeDTO.getLastName());
     employeeModel.setDateNasciment(employeeDTO.getDateNasciment());
@@ -1046,28 +1047,32 @@ public ResponseMessageStatus createEmployeeService(EmployeeDTO employeeDTO){
     
     updateNumberEmployee(employeeDTO.getCnpjEnterprise());
     
-    String message="Funcionário criado com sucesso";
-    Integer status=201;
-    return new ResponseMessageStatus(message,status);
+    return employeeModel;
 }
 ```
-#### O método é do tipo ResponseMessageStatus,e recebe como parâmetro employeeDTO do tipo EmployeeDTO  
+#### O método é do tipo Employee,e recebe como parâmetro employeeDTO do tipo EmployeeDTO  
 #### A variável employeeModel do tipo Employee,recebe um mapeamento de employeeDTO para Employee.É setado em employeeModel o  firstName,lastName,dateNasciment,gender,sector,cep,cnpjEnterprise,userLevel,login,password e token,vindos de employeeDTO.
 #### Acessa o método save() de repository,e passa como argumento employeeModel.Acessa o método updateNumberEmployee() passando como parâmetro cnpjEnterprise.
-#### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status do tipo Integer,recebe valores personalizados.Retorna uma nova instância de ResponseMessageStatus,passando como argumentos,message e status. 
+#### Retorna employeeModel. 
 
 <br>
 
 #### • getAllEmployeeService
 ```
 public Page<EmployeeDTO> getAllEmployeeService(Pageable pageable){
-    return repository
-            .findAll(pageable)
-            .map(employee -> modelMapper.map(employee, EmployeeDTO.class));
+    Page<Employee> employeeDTOList = repository.findAll(pageable);
+
+    if(employeeDTOList.isEmpty()){
+        throw new NotFoundException("Funcionários",'o');
+    }
+
+    return employeeDTOList.map(employee -> modelMapper.map(employee, EmployeeDTO.class));
 }
 ```
 #### O método é do tipo Page<EmployeeDTO>,e recebe como parâmetro pageable do tipo Pageable.
-#### Retorna o método findAll() de repository passando pageable como argumento,acessa o método map() que tem como parâmetro employee,e realiza um mapeamento de employee para EmployeeDTO.  
+#### A variável employeeDTOList,é do tipo Page<Employee>,e recebe o método findAll() de repository,passando pageable como argumento.
+#### É verificado se employeeDTOList é vazio,se for,será lançada uma nova exceção de NotFoundException com uma mensagem personalizada. 
+#### Retorna o método map() de employeeDTOList,e tem como parâmetro employee,e realiza um mapeamento de employee para EmployeeDTO.  
 
 <br>
 
@@ -1177,7 +1182,7 @@ public void updateNumberEmployee(String cnpj){
 
 #### • createPointService
 ```
-public ResponseMessageStatus createPointService(PointDTO pointDTO){
+public Point createPointService(PointDTO pointDTO){
     Point pointModel = modelMapper.map(pointDTO, Point.class);
 
     pointModel.setEmployeeId(pointDTO.getEmployeeId());
@@ -1189,28 +1194,33 @@ public ResponseMessageStatus createPointService(PointDTO pointDTO){
 
     repository.save(pointModel);
 
-    String message = "Ponto criado com sucesso!";
-    Integer status=201;
-    return new ResponseMessageStatus(message,status);
+    return pointModel;
 }
 ```
-#### O método é do tipo ResponseMessageStatus,e recebe um parâmetro,pointDTO do tipo PointDTO.
+#### O método é do tipo Point,e recebe um parâmetro,pointDTO do tipo PointDTO.
 #### A variável pointModel é do tipo Point,recebe mapeamento através do método map(),de pointDTO para Point. 
 #### É setado employeeId,date,checkInTime,CheckOutLunch,backLunch,checkOutTime em pointModel,vindos de pointDTO.É acessado o método save() de repository,passando pointModel como argumento.  
-#### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status do tipo Integer,recebe valores personalizados.Retorna uma nova instância de ResponseMessageStatus,passando como argumentos,message e status.
+#### Retorna pointModel.
 
 <br>
 
 #### • getAllPointService
 ```
 public Page<PointDTO> getAllPointService(Pageable pageable){
-    return repository
-            .findAll(pageable)
+    Page<Point> pointPage = repository.findAll(pageable);
+
+    if(pointPage.isEmpty()){
+        throw new NotFoundException("Pontos",'o');
+    }
+
+    return pointPage
             .map(point -> modelMapper.map(point, PointDTO.class));
 }
 ```
 #### O método é do tipo Page<PointDTO>,e recebe como parâmetro pageable do tipo Pageable.
-#### Retorna o método findAll() de repository passando pageable como argumento,acessa o método map() que tem como parâmetro point,e realiza um mapeamento de point para PointDTO.
+#### A variável pointPage,é do tipo Page<Point>,e recebe o método findAll() de repository passando pageable como argumento.
+#### É verificado se pointPage é vazio,se for,lança uma nova exceção de NotFoundException,passando "Pontos" e 'o' como argumentos.
+#### Retorna o método map() de pointPage,tem como parâmetro point,e realiza um mapeamento de point para PointDTO.
 
 <br>
 
@@ -1219,13 +1229,13 @@ public Page<PointDTO> getAllPointService(Pageable pageable){
 public PointDTO getPointByIdService(Long id){
     existsPoint(id);
 
-    Point point = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ponto não encontrado"));
+    Point point = repository.findById(id).orElseThrow(() -> new NotFoundException("Ponto",'o'));
     return modelMapper.map(point, PointDTO.class);
 }
 ```
 #### O método é do tipo PointDTO,e recebe um parâmetro,id do tipo Long. 
 #### Acessa o método existsPoint(),passando id como argumento.
-#### A variável point é do tipo Point,recebe o método findById() de repository,e passa id como argumento,acessa o método orElseThrow(),lançando uma nova exceção EntityNotFoundException,com uma mensagem personalizada. 
+#### A variável point é do tipo Point,recebe o método findById() de repository,e passa id como argumento,acessa o método orElseThrow(),lançando uma nova exceção NotFoundException,com uma mensagem personalizada. 
 #### Retorna um mapeamento de point,para PointDTO.
 
 <br>
@@ -1235,7 +1245,7 @@ public PointDTO getPointByIdService(Long id){
 public ResponseMessageStatus updatePointByIdService(Long id,PointDTO pointDTO){
     existsPoint(id);
 
-    Point point = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ponto não encontrado"));
+    Point point = repository.findById(id).orElseThrow(() -> new NotFoundException("Ponto",'o'));
     point.setEmployeeId(pointDTO.getEmployeeId());
     point.setDate(pointDTO.getDate());
     point.setCheckInTime(pointDTO.getCheckInTime());
@@ -1250,7 +1260,7 @@ public ResponseMessageStatus updatePointByIdService(Long id,PointDTO pointDTO){
 }
 ```
 #### O método é do tipo ResponseMessageStatus,e recebe como parâmetros,id do tipo Long,e pointDTO do tipo PointDTO.
-#### Acessa o método existsPoint(),passando o id como argumento.A variável point é do tipo Point,recebe o método findById() de repository,e passa id como argumento,acessa o método orElseThrow(),lançando uma nova exceção EntityNotFoundException,com uma mensagem personalizada.
+#### Acessa o método existsPoint(),passando o id como argumento.A variável point é do tipo Point,recebe o método findById() de repository,e passa id como argumento,acessa o método orElseThrow(),lançando uma nova exceção NotFoundException,com uma mensagem personalizada.
 #### É setado employeeId,date,checkInTime,CheckOutLunch,backLunch,checkOutTime em point,vindos de pointDTO.É acessado o método save() de repository,passando point como argumento.
 #### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status do tipo Integer,recebe valores personalizados.Retorna uma nova instância de ResponseMessageStatus,passando como argumentos,message e status.
 
@@ -1275,13 +1285,13 @@ public void existsPoint(Long id){
     boolean existsPoint = repository.existsById(id);
 
     if(!existsPoint){
-        throw new EntityNotFoundException("Ponto não encontrado");
+        throw new NotFoundException("Ponto",'o');
     }
 }
 ```
 #### O método não tem retorno,e recebe como parâmetro id do tipo Long.
 #### A variável existsPoint,é do tipo boolean,e recebe o método existsById() de repository,passando id como argumento.
-#### É verificado se existsPoint é false,se for,é lançado uma nova exceção EntityNotFoundException,com uma mensagem personalizada.
+#### É verificado se existsPoint é false,se for,é lançado uma nova exceção NotFoundException,com uma mensagem personalizada.
 
 <br>
 
@@ -1291,13 +1301,13 @@ public void existsEmployee(Long id){
    boolean existsEmployee = employeeRepository.existsById(id);
 
    if(!existsEmployee){
-       throw new EntityNotFoundException("ID do Funcionário não encontrado");
+       throw new NotFoundException("ID do Funcionário",'o');
    }
 }
 ```
 #### O método não tem retorno,e recebe como parâmetro id do tipo Long.
 #### A variável existsEmployee,é do tipo boolean,e recebe o método existsById() de enterpriseRepository,passando id como argumento.
-#### É verificado se existsEmployee retorna false,se for,é lançado uma nova exceção EntityNotFoundException,com uma mensagem personalizada.
+#### É verificado se existsEmployee retorna false,se for,é lançado uma nova exceção NotFoundException,com uma mensagem personalizada.
 
 
 --------------------------------------------------------------
