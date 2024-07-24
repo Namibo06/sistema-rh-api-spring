@@ -6,7 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SectorDTO{
-    private Long id;
     private String name;
     private Long enterprise_id;
 }
