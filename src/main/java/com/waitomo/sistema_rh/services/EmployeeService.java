@@ -3,6 +3,7 @@ package com.waitomo.sistema_rh.services;
 import com.waitomo.sistema_rh.dtos.EmployeeDTO;
 import com.waitomo.sistema_rh.dtos.EnterpriseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
+import com.waitomo.sistema_rh.exceptions.NotFoundException;
 import com.waitomo.sistema_rh.models.Employee;
 import com.waitomo.sistema_rh.models.Enterprise;
 import com.waitomo.sistema_rh.repositories.EmployeeRepository;
@@ -60,14 +61,14 @@ public class EmployeeService {
     public EmployeeDTO getEmployeeByIdService(Long id){
         existsEmployee(id);
 
-        Employee employee = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+        Employee employee = repository.findById(id).orElseThrow(() -> new NotFoundException("Funcionário",'o'));
         return modelMapper.map(employee, EmployeeDTO.class);
     }
 
     public ResponseMessageStatus updateEmployeeByIdService(Long id,EmployeeDTO employeeDTO){
         existsEmployee(id);
 
-        Employee employee = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+        Employee employee = repository.findById(id).orElseThrow(() -> new NotFoundException("Funcionário",'o'));
         employee.setFirstName(employeeDTO.getFirstName());
         employee.setLastName(employeeDTO.getLastName());
         employee.setDateNasciment(employeeDTO.getDateNasciment());
@@ -96,7 +97,7 @@ public class EmployeeService {
         boolean existsEmployeeById = repository.existsById(id);
 
         if(!existsEmployeeById){
-            throw new EntityNotFoundException("Funcionário não encontrado");
+            throw new NotFoundException("Funcionário",'o');
         }
     }
 
