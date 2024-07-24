@@ -310,24 +310,29 @@ Long existsByCep(@Param("cep") String cep);
 
 #### • createToken
 ```
-public String createToken(){
+public TokenResponseDTO createToken(){
     try{
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + 3600 * 1000 * 3);
         Algorithm algorithm = Algorithm.HMAC256("WaitomoHiper12çCorporation");
 
-        return JWT.create()
-                .withIssuer("Sistema RH")
-                .withExpiresAt(expirationDate)
-                .sign(algorithm);
+         String token = JWT.create()
+                    .withIssuer("Sistema RH")
+                    .withExpiresAt(expirationDate)
+                    .sign(algorithm);
+
+            String message = "Login realizado e token criado";
+            Integer status = 201;
+
+            return new TokenResponseDTO(token,message,status);
     }catch (JWTCreationException e){
         throw new RuntimeException("Falha ao criar token: "+e);
     }
 }
 ```
-#### O método retorna uma String e não recebe parâmetros.
+#### O método retorna TokenResponseDTO e não recebe parâmetros.
 #### No bloco try,é setado uma variável "now" do tipo Date,que recebe uma nova instãncia da classe Date,é setado uma outra variável "expirationDate" do tipo Date,que recebe new Date e como argumento,recupera a hora da variável "now" e adiciona mais 1 hora,é setado logo após uma variável algorithm do tipo Algortihm,que recebe o tipo que será criptografado de Algorithm passando a chave secreta como argumento.
-#### Retorna o método create do JWT,na qual passa quem é responsável pelo token,a sua data de expiração,e a sua assinatura. 
+#### A variável token,é do tipo String,e recebe o método create do JWT,na qual passa quem é responsável pelo token,a sua data de expiração,e a sua assinatura.A variável message é do tipo String,e recebe uma mensagem personalizada,a variável status ´´e do tipo Integer,e recebe um valor personalizado,o retorno é uma nova instância de TokenResponseDTO,passando token,message e status como argumento.  
 #### No bloco catch,é acessado caso seja uma exceção do tipo JWTCreationException,e é lançado caso caia neste bloco uma nova exceção RuntimeException com uma mensagem personalizada junto da variável que recupera a mensagem de erro.
 
 <br>
@@ -364,7 +369,7 @@ public ResponseMessageStatus verifyToken(Long id,String token){
 #### • updateTokenByUser
 
 ```
-public ResponseMessageStatus updateTokenByUser(String login, String token){
+public ResponseMessageStatus updateTokenByUser(String login,TokenResponseDTO token){
     Optional<Employee> employee = repository.findByLogin(login);
     if (employee.isEmpty()) {
         throw new EntityNotFoundException("Funcionário não encontrado");
@@ -372,11 +377,11 @@ public ResponseMessageStatus updateTokenByUser(String login, String token){
 
     Employee employeeModel = employee.get();
 
-    if(token.isEmpty()){
+    if(token.getToken().isEmpty()){
         throw new IllegalArgumentException("Token nulo ou vazio");
     }
 
-    employeeModel.setToken(token);
+    employeeModel.setToken(token.getToken());
     repository.save(employeeModel);
 
     String message = "Token criado e atualizado com sucesso";
@@ -385,7 +390,7 @@ public ResponseMessageStatus updateTokenByUser(String login, String token){
     return new ResponseMessageStatus(message,status);
 }
 ```
-#### O método retorna ResponseMessageStatus e recebe por parâmetros,login do tipo String,e token do tipo String.
+#### O método retorna ResponseMessageStatus e recebe por parâmetros,login do tipo String,e token do tipo TokenResponseDTO.
 #### A variável employee é do tipo Optional<Employee> e recebe o método findByLogin() do repository,tendo como argumento o parâmetro login.É verificado se employee é vazio,se for é lançada uma exceção EntityNotFoundException com uma mensagem personalizada.
 #### A variável employeeModel,recebe employee,acessando seus atributos pelo método get().É verificado se o parâmetro token é vazio,se for,será lançada uma exceção IllegalArgumentException,com uma mensagem personalizada.
 #### A variável employeeModel,acessa o método setToken() e recebe token como argumento,abaixo é acessado o método save() de repository passando employeeModel como argumento.
