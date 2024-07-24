@@ -30,8 +30,9 @@ public class EmployeeService {
     @Autowired
     private PasswordEncoder encoder;
 
-    public ResponseMessageStatus createEmployeeService(EmployeeDTO employeeDTO){
+    public EmployeeDTO createEmployeeService(EmployeeDTO employeeDTO){
         Employee employeeModel = modelMapper.map(employeeDTO, Employee.class);
+
         employeeModel.setFirstName(employeeDTO.getFirstName());
         employeeModel.setLastName(employeeDTO.getLastName());
         employeeModel.setDateNasciment(employeeDTO.getDateNasciment());
@@ -47,9 +48,7 @@ public class EmployeeService {
 
         updateNumberEmployee(employeeDTO.getCnpjEnterprise());
 
-        String message="Funcionário criado com sucesso";
-        Integer status=201;
-        return new ResponseMessageStatus(message,status);
+        return modelMapper.map(employeeModel,EmployeeDTO.class);
     }
 
     public Page<EmployeeDTO> getAllEmployeeService(Pageable pageable){
