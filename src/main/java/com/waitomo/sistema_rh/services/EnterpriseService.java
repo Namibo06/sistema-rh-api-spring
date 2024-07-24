@@ -89,13 +89,12 @@ public class EnterpriseService {
     }
 
     public Page<EnterpriseDTO> findAllEnterprises(Pageable pageable){
-        List<Enterprise> enterprises = enterpriseRepository.findAll();
+        Page<Enterprise> enterprises = enterpriseRepository.findAll(pageable);
         if(enterprises.isEmpty()){
             throw new NotFoundException("Empresas",'a');
         }
 
-        return enterpriseRepository
-                .findAll(pageable)
+        return enterprises
                 .map(enterprise ->
                     modelMapper.map(enterprise,EnterpriseDTO.class)
                 );
