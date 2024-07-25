@@ -398,13 +398,13 @@ public ResponseMessageStatus verifyToken(Long id,String token){
 public ResponseMessageStatus updateTokenByUser(String login,TokenResponseDTO token){
     Optional<Employee> employee = repository.findByLogin(login);
     if (employee.isEmpty()) {
-        throw new EntityNotFoundException("Funcionário não encontrado");
+        throw new NotFoundException("Funcionário",'o');
     }
 
     Employee employeeModel = employee.get();
 
     if(token.getToken().isEmpty()){
-        throw new IllegalArgumentException("Token nulo ou vazio");
+        throw new TokenNullOrEmptyException();
     }
 
     employeeModel.setToken(token.getToken());
@@ -417,8 +417,8 @@ public ResponseMessageStatus updateTokenByUser(String login,TokenResponseDTO tok
 }
 ```
 #### O método retorna ResponseMessageStatus e recebe por parâmetros,login do tipo String,e token do tipo TokenResponseDTO.
-#### A variável employee é do tipo Optional<Employee> e recebe o método findByLogin() do repository,tendo como argumento o parâmetro login.É verificado se employee é vazio,se for é lançada uma exceção EntityNotFoundException com uma mensagem personalizada.
-#### A variável employeeModel,recebe employee,acessando seus atributos pelo método get().É verificado se o parâmetro token é vazio,se for,será lançada uma exceção IllegalArgumentException,com uma mensagem personalizada.
+#### A variável employee é do tipo Optional<Employee> e recebe o método findByLogin() do repository,tendo como argumento o parâmetro login.É verificado se employee é vazio,se for é lançada uma exceção NotFoundException com uma mensagem personalizada.
+#### A variável employeeModel,recebe employee,acessando seus atributos pelo método get().É verificado se o parâmetro token é vazio,se for,será lançada uma exceção TokenNullOrEmptyException,com uma mensagem personalizada.
 #### A variável employeeModel,acessa o método setToken() e recebe token como argumento,abaixo é acessado o método save() de repository passando employeeModel como argumento.
 #### A variável message,é tipo String,e recebe uma mensagem personalizada,a variável status,é do tipo Integer e recebe um valor personalizado,e é retornado uma nova instância de ResponseMessageStatus,passando message e status como argumento.
 
@@ -427,12 +427,12 @@ public ResponseMessageStatus updateTokenByUser(String login,TokenResponseDTO tok
 #### • findByLogin
 ```
 public EmployeeDTO findByLogin(String login){
-    Employee employee= repository.findByLogin(login).orElseThrow(()-> new EntityNotFoundException("Funcionário não encontrado"));
+    Employee employee= repository.findByLogin(login).orElseThrow(()-> new NotFoundException("Funcionário",'o'));
     return modelMapper.map(employee, EmployeeDTO.class);
 }
 ```
 #### O método retorna EmployeeDTO e recebe por parâmetro,login do tipo String.
-#### A variável employee é do tipo Employee,e recebe o método findByLogin() do repository,passando como argumento o parâmetro login,acessando o método orElseThrow para evitar NullPointerException,lançando uma nova instância de EntityNotFoundException com uma mensagem personalizada,caso seja preciso.
+#### A variável employee é do tipo Employee,e recebe o método findByLogin() do repository,passando como argumento o parâmetro login,acessando o método orElseThrow para evitar NullPointerException,lançando uma nova instância de NotFoundException com uma mensagem personalizada,caso seja preciso.
 #### O retorno é através de um mapeamento de dados,da variável employee,para a class EmployeeDTO.
 
 <br>
@@ -447,7 +447,7 @@ public boolean findEmployeeByLoginAndPassword(LoginResponseDTO credentials){
 
         boolean checkPassword = encoder.matches(credentials.password(), employee.getPassword());
         if (!checkPassword) {
-            throw new BadCredentialsException("Senhas não batem");
+            throw new BadRequestException("Senhas não batem");
         }
         return true;
     }
@@ -456,7 +456,7 @@ public boolean findEmployeeByLoginAndPassword(LoginResponseDTO credentials){
 ```
 #### O método retorna boolean e recebe por parâmetro,credentials do tipo LoginResposeDTO.
 #### A variável optionalEmployee,é do tipo Optional<Employee>,e acessa o método findByLogin de repository,passando como argumento login que é acessado através de credentials.
-#### É verificado se optionalEmployee retorna um valor não nulo.A variável employee é do tipo Employee,e recebe o método get() de employeeEmployee recuperando seus dados,a variável checkPassword é do tipo boolean,recebe o método matches da dependêcia encoder,passando como argumento a password dentro de credentials e password dentro de employee que verifica se são iguais ou não.É verificado se checkPassword é false,se for é lançado uma nova exceção de BadCredentialsException com uma mensagem personalizada. 
+#### É verificado se optionalEmployee retorna um valor não nulo.A variável employee é do tipo Employee,e recebe o método get() de employeeEmployee recuperando seus dados,a variável checkPassword é do tipo boolean,recebe o método matches da dependêcia encoder,passando como argumento a password dentro de credentials e password dentro de employee que verifica se são iguais ou não.É verificado se checkPassword é false,se for é lançado uma nova exceção de BadRequestException com uma mensagem personalizada. 
 #### O retorno é true,se as senhas forem iguais,o retorno é false,se optionalEmployee for vazio
 
 <br><br>
@@ -982,16 +982,14 @@ public ResponseMessageStatus verifyAddressService(String cep) {
                     repository.save(address);
 
                     String MESSAGE_SUCCESS_CREATED = "Cep criado e inserido com sucesso!";
-                    Integer STATUS_SUCCESS_CREATED = 200;
+                    Integer STATUS_SUCCESS_CREATED = 201;
                     return new ResponseMessageStatus(MESSAGE_SUCCESS_CREATED, STATUS_SUCCESS_CREATED);
                 }
             }
         } catch (Exception e) {
             throw new RuntimeException("Erro ao consultar serviço ViaCEP: " + e.getMessage());
         }
-        String MESSAGE_FAILED = "Houve alguma falha ao tentar consular o serviço da ViaCep";
-        Integer STATUS_FAILED = 400;
-        return new ResponseMessageStatus(MESSAGE_FAILED, STATUS_FAILED);
+        throw new BadRequestException("Houve alguma falha ao tentar consultar o serviço da ViaCep");
     }
 }
 ```
@@ -1001,9 +999,9 @@ public ResponseMessageStatus verifyAddressService(String cep) {
 #### Se existsAddress retornar false,a variável cep,recebe o método replaceAll de cep,passando que tudo que não for números de 0 a 9,será removido.A variável url é do tipo String,e recebe a url da API da ViaCep passando o cep para consulta.
 #### No bloco try,a variável response é do tipo ResponseEntity<Map<String, String>>,acessa o método exchange() de restTemplate,passando como parâmetros,url (a url que será enviada a requisição),HttpMethod.GET (é o tipo do método da requisição),null (a entidade da requisição,é null,porqê o método GET não possui corpo da requisição),new ParameterizedTypeReference<Map<String, String>>() {} (ParameterizedTypeReference é um classe usada para lidar com tipos genéricos,é utilizado para informar ao RestTemplate o tipo exato da resposta esperada).
 #### É verificado se o status de response é igual ao método OK de HttpStatus.A variável responseBody é do tipo Map<String, String>,e recebe o método getBody() de response,para recuperar o corpo da resposta da chamadaa API da  ViaCep.
-#### É verificado se responseBody é diferente de null e se é diferente de vazio,passando nessa condição temavariável address do tipo EmployeeAddress,que recebe uma nova instância de EmployeeAddress,logo após é setado os valores no cep,uf,city,neighborhood e road,depois é acessado o método save() de repository,passando como argumento address.Após isso tem duas variáveis uma é MESSAGE_SUCCESS_CREATED,do tipo String com uma mensagem personalizada,e a outra STATUS_SUCCESS_CREATED,do tipo Integer com um valor personalizado,é retornado uma nova instância de ResponseMessageStatus,passando como argumentos MESSAGE_SUCCESS_CREATED e STATUS_SUCCESS_CREATED. 
+#### É verificado se responseBody é diferente de null e se é diferente de vazio,passando nessa condição tem a variável address do tipo EmployeeAddress,que recebe uma nova instância de EmployeeAddress,logo após é setado os valores no cep,uf,city,neighborhood e road,depois é acessado o método save() de repository,passando como argumento address.Após isso tem duas variáveis uma é MESSAGE_SUCCESS_CREATED,do tipo String com uma mensagem personalizada,e a outra STATUS_SUCCESS_CREATED,do tipo Integer com um valor personalizado,é retornado uma nova instância de ResponseMessageStatus,passando como argumentos MESSAGE_SUCCESS_CREATED e STATUS_SUCCESS_CREATED. 
 #### No bloco catch,caso seja capturado uma Exception,será lançada a exceção RuntimeException com uma mensagem personalizada,junto com a mensagem de erro captturada pela variável e,sendo recuperado pelo método getMessage().
-#### Ainda dentro do else,caso não caia nem no try e nem no catch,tem a variável MESSAGE_FAILED do tipo String com uma mensagem personalizada,e STATUS_FAILED do tipo Integer com um valor personalizado,que por fim retorna uma nova instância de ResponseMessageStatus,passando por argumentos,MESSAGE_FAILED e STATUS_FAILED. 
+#### Ainda dentro do else,caso não caia nem no try e nem no catch,é lançada uma nova exceção de BadRequestException com uma mensagem personalizada,para dizer que houve algum erro ao tentar consltar os serviços da ViaCep. 
 
 <br>
 
@@ -1013,17 +1011,13 @@ public boolean existAddress(String cep){
     cep = cep.replaceAll("[^0-9]","");
     Long result = repository.existsByCep(cep);
 
-    if(result != 0){
-        return true;
-    }else{
-        return false;
-    }
+    return result != 0;
 }
 ```
 #### O método é do tipo boolean,e recebe como parâmetro cep do tipo String.
 #### A variável cep,recebe o método replaceAll de cep,para permitir que somente haja números de 0 a 9,se tiver símbolos ou letras serão removidos.
 #### A variável result é do tipo Long,acessa o método existsByCep de repository,passando como argumento cep.
-#### É verificado se resul é diferente de 0,se for retorna true,senão retorna false.
+#### Retorna result quando for diferente de 0,ou seja,quando for true.
 
 <br><br>
 
@@ -1336,7 +1330,7 @@ public ResponseEntity<ResponseMessageStatus> login(@RequestBody LoginResponseDTO
         boolean existsEmployee=service.findEmployeeByLoginAndPassword(credentials);
         
         if(!existsEmployee){
-            throw new EntityNotFoundException("Funcionário não encontrado");
+            throw new NotFoundException("Funcionário",'o');
         }
 
         TokenResponseDTO tokenCreated = service.createToken();
@@ -1353,7 +1347,7 @@ public ResponseEntity<ResponseMessageStatus> login(@RequestBody LoginResponseDTO
 }
 ```
 #### O método retorna ResponseEntity<ResponseMessageStatus> e recebe por parâmetro,credentials do tipo LoginResposeDTO pela anotação "@RequestBody".
-#### No bloco try,a variável existsEmployee,é do tipo boolean,,e recebe o método findEmployeeByLoginAndPassword() da service,passando como argumento credentials.É verificado se o retorno de existsEmployee for false,é lançada uma exceção EntityNotFoundException com uma mensagem personalizada
+#### No bloco try,a variável existsEmployee,é do tipo boolean,,e recebe o método findEmployeeByLoginAndPassword() da service,passando como argumento credentials.É verificado se o retorno de existsEmployee for false,é lançada uma exceção NotFoundException com uma mensagem personalizada
 #### A variável tokeCreated,é do tipo TokenResponseDTO,e retorna o método createToken() da service.É acessado o método updateTokenByUser() da service passando como parâmetro,o loginde credentials,e a variável tokenCreated que contém o token.Retorna o método ok() de ResponseEntity,passando como argumento a variável tokenCreated. 
 #### No bloco catch que espera uma exceção do tipo Exception.
 #### A variável message,é do tipo String,e recebe uma mensagem personalizada,a variável status é do tipo Integer,e recebe um valor personalizado,a variável response é do tipo TokenResponseDTO,e recebe uma nova instância de ResponseMessageStatu,passando como argumento um campo vazio,message e status.
