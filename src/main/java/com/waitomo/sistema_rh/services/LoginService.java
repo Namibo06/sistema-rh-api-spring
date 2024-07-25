@@ -7,6 +7,9 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.waitomo.sistema_rh.dtos.*;
+import com.waitomo.sistema_rh.exceptions.BadRequestException;
+import com.waitomo.sistema_rh.exceptions.NotFoundException;
+import com.waitomo.sistema_rh.exceptions.TokenNullOrEmptyException;
 import com.waitomo.sistema_rh.models.Employee;
 import com.waitomo.sistema_rh.repositories.EmployeeRepository;
 import com.waitomo.sistema_rh.repositories.SectorRepository;
@@ -77,13 +80,13 @@ public class LoginService {
     public ResponseMessageStatus updateTokenByUser(String login, TokenResponseDTO token){
         Optional<Employee> employee = repository.findByLogin(login);
         if (employee.isEmpty()) {
-            throw new EntityNotFoundException("Funcionário não encontrado");
+            throw new NotFoundException("Funcionário",'o');
         }
 
         Employee employeeModel = employee.get();
 
         if(token.getToken().isEmpty()){
-            throw new IllegalArgumentException("Token nulo ou vazio");
+            throw new TokenNullOrEmptyException();
         }
 
         employeeModel.setToken(token.getToken());
@@ -96,7 +99,7 @@ public class LoginService {
     }
 
     public EmployeeDTO findByLogin(String login){
-        Employee employee= repository.findByLogin(login).orElseThrow(()-> new EntityNotFoundException("Funcionário não encontrado"));
+        Employee employee= repository.findByLogin(login).orElseThrow(()-> new NotFoundException("Funcionário",'o'));
         return modelMapper.map(employee, EmployeeDTO.class);
     }
 
@@ -108,7 +111,7 @@ public class LoginService {
 
             boolean checkPassword = encoder.matches(credentials.password(), employee.getPassword());
             if (!checkPassword) {
-                throw new BadCredentialsException("Senhas não batem");
+                throw new BadRequestException("Senhas não batem");
             }
             return true;
         }
