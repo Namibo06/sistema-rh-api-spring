@@ -2,13 +2,12 @@ package com.waitomo.sistema_rh.controllers;
 
 import com.waitomo.sistema_rh.dtos.LoginResponseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
-import com.waitomo.sistema_rh.dtos.TokenResponse;
+import com.waitomo.sistema_rh.dtos.TokenRequestDTO;
 import com.waitomo.sistema_rh.dtos.TokenResponseDTO;
 import com.waitomo.sistema_rh.exceptions.NotFoundException;
 import com.waitomo.sistema_rh.services.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +43,7 @@ public class LoginController {
 
     @PostMapping("/token/{id}")
     @Operation(summary = "Validar token",security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id, @RequestBody TokenResponse tokenResponse){
+    public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id, @RequestBody TokenRequestDTO tokenResponse){
         ResponseMessageStatus response = service.verifyToken(id,tokenResponse.token());
 
         return ResponseEntity.ok(response);
