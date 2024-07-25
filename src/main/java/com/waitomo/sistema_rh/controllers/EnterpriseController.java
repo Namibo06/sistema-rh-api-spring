@@ -3,6 +3,7 @@ package com.waitomo.sistema_rh.controllers;
 import com.waitomo.sistema_rh.dtos.EmployeeDTO;
 import com.waitomo.sistema_rh.dtos.EnterpriseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
+import com.waitomo.sistema_rh.models.Enterprise;
 import com.waitomo.sistema_rh.services.EnterpriseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -26,8 +27,8 @@ public class EnterpriseController {
     @PostMapping
     @Operation(summary = "Criar empresa")
     public ResponseEntity<ResponseMessageStatus> createEnterprise(@RequestBody EnterpriseDTO enterprise, UriComponentsBuilder uriBuilder){
-        EnterpriseDTO enterpriseDTO=enterpriseService.createEnterpriseService(enterprise);
-        Long enterpriseId = enterpriseDTO.getId();
+        Enterprise enterpriseModel=enterpriseService.createEnterpriseService(enterprise);
+        Long enterpriseId = enterpriseModel.getId();
         URI path = uriBuilder.path("/enterprises/{id}").buildAndExpand(enterpriseId).toUri();
 
         String message="Empresa criada com sucesso!";
