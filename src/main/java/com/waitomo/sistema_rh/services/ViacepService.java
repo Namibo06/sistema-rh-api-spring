@@ -2,6 +2,7 @@ package com.waitomo.sistema_rh.services;
 
 import com.waitomo.sistema_rh.dtos.EmployeeAddressDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
+import com.waitomo.sistema_rh.exceptions.BadRequestException;
 import com.waitomo.sistema_rh.models.EmployeeAddress;
 import com.waitomo.sistema_rh.repositories.EmployeeAddressRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -55,16 +56,14 @@ public class ViacepService {
                         repository.save(address);
 
                         String MESSAGE_SUCCESS_CREATED = "Cep criado e inserido com sucesso!";
-                        Integer STATUS_SUCCESS_CREATED = 200;
+                        Integer STATUS_SUCCESS_CREATED = 201;
                         return new ResponseMessageStatus(MESSAGE_SUCCESS_CREATED, STATUS_SUCCESS_CREATED);
                     }
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Erro ao consultar serviço ViaCEP: " + e.getMessage());
             }
-            String MESSAGE_FAILED = "Houve alguma falha ao tentar consular o serviço da ViaCep";
-            Integer STATUS_FAILED = 400;
-            return new ResponseMessageStatus(MESSAGE_FAILED, STATUS_FAILED);
+            throw new BadRequestException("Houve alguma falha ao tentar consultar o serviço da ViaCep");
         }
     }
 
@@ -72,12 +71,6 @@ public class ViacepService {
         cep = cep.replaceAll("[^0-9]","");
         Long result = repository.existsByCep(cep);
 
-        if(result != 0){
-            return true;
-        }else{
-            return false;
-        }
+        return result != 0;
     }
-
-
 }
