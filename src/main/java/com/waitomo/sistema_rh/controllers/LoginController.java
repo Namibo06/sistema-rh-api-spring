@@ -4,6 +4,7 @@ import com.waitomo.sistema_rh.dtos.LoginResponseDTO;
 import com.waitomo.sistema_rh.dtos.ResponseMessageStatus;
 import com.waitomo.sistema_rh.dtos.TokenResponse;
 import com.waitomo.sistema_rh.dtos.TokenResponseDTO;
+import com.waitomo.sistema_rh.exceptions.NotFoundException;
 import com.waitomo.sistema_rh.services.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -22,10 +23,10 @@ public class LoginController {
     @Operation(summary = "Realizar login")
     public ResponseEntity<TokenResponseDTO> login(@RequestBody LoginResponseDTO credentials){
         try {
-
             boolean existsEmployee=service.findEmployeeByLoginAndPassword(credentials);
+
             if(!existsEmployee){
-                throw new EntityNotFoundException("Funcionário não encontrado");
+                throw new NotFoundException("Funcionário",'o');
             }
 
             TokenResponseDTO tokenCreated = service.createToken();
