@@ -254,14 +254,26 @@ public ResponseEntity<ErrorResponseDTO> handleBadRequestException(BadRequestExce
 #### • handleAlreadyExistsException
 ```
 public ResponseEntity<ErrorResponseDTO> handleAlreadyExistsException(AlreadyExistsException ex){
-        ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(), "Registro já existente");
-        return new ResponseEntity<>(errorResponse,HttpStatus.CONFLICT);
-    }
+    ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(), "Registro já existente");
+    return new ResponseEntity<>(errorResponse,HttpStatus.CONFLICT);
+}
 ```
 #### O método é do tipo ResponseEntity<ErrorResponseDTO>,recebe como parâmetro ex do tipo AlreadyExistsException.
 #### A variável errorResponse do tipo ErrorResponseDTO,recebe uma nova instância de ErrorResponseDTO,e passa o método getMessage() de ex,e uma mensagem como argumento.
 #### Retorna uma nova instância de ResponseEntity,passando errorResponse e a propriedade CONFLICT de HttpStatus como argumento.
 
+<br>
+
+#### • handleTokenNullOrEmptyException
+```
+public ResponseEntity<ErrorResponseDTO> handleTokenNullOrEmptyException(TokenNullOrEmptyException ex){
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(), "Token nulo ou vazio");
+        return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
+    }
+```
+#### O método é do tipo ResponseEntity<ErrorResponseDTO>,recebe como parâmetro ex do tipo TokenNullOrEmptyException.
+#### A variável errorResponse do tipo ErrorResponseDTO,recebe uma nova instância de ErrorResponseDTO,e passa o método getMessage() de ex,e uma mensagem como argumento.
+#### Retorna uma nova instância de ResponseEntity,passando errorResponse e a propriedade NOT_FOUND de HttpStatus como argumento.
 
 <br><br>
 
@@ -277,6 +289,11 @@ public ResponseEntity<ErrorResponseDTO> handleAlreadyExistsException(AlreadyExis
 
 ### AlreadyExistsException
 #### Estende de RuntimeException,recebe um construtor,com parâmetros,sufix do tipo Character,e classNamme do tipo String,acessa o método super na qual irá receber uma mensagem personalizada.
+
+<br>
+
+### TokenNullOrEmptyException
+#### Estende de RuntimeException,recebe um construtor,não possui parâmetros,acessa o método super na qual irá passar uma mensagem personalizada.
 
 
 --------------------------------------------------------------
@@ -472,7 +489,7 @@ public boolean findEmployeeByLoginAndPassword(LoginResponseDTO credentials){
 
 #### • createEnterpriseService
 ```
-public EnterpriseDTO createEnterpriseService(EnterpriseDTO enterprise){
+public Enterprise createEnterpriseService(EnterpriseDTO enterprise){
     Enterprise enterpriseModel = new Enterprise();
     
     enterpriseModel.setCnpj(enterprise.getCnpj());
@@ -508,37 +525,37 @@ public EnterpriseDTO createEnterpriseService(EnterpriseDTO enterprise){
             null);
     employeeService.createEmployeeService(employeeDTO);
     
-    return modelMapper.map(enterpriseModel,EnterpriseDTO.class);
+    return enterpriseModel;
 }
 ```
-#### O método retorna o tipo EnterpriseDTO,tem parâmetro,enterprise do tipo EnterpriseDTO
+#### O método retorna o tipo Enterprise,tem parâmetro,enterprise do tipo EnterpriseDTO
 #### A variável enterpriseModel do tipo Enterprise,recebe uma nova instância de Enterprise
 #### Seto em enterpriseModel o cnpj,como argumento recupero o cnpj de enterprise.É verificado abaixo se cnpj é vazio ou nulo,que aí é lançada uma exceção BadRequestException com uma mensagem personalizada.É verificado logo abaixo também se o tamanho do cpj é diferente de 14,se for,,é lançada uma exceção BadRequestException com uma mensagem personalizada.
 #### É setado em enterpriseModel,o fantasy name,passando como argumento fantasy name vindo de enterprise.É setado em enterpriseModel,a company name,passando como argumento company name vindo de enterprise.É setado em enterpriseModel,o number employees,passando como argumento number employees vindo de enterprise.A variável enterpriseCreated do tipo Enterprise,recebe o método save() do enterpriseRepository na qual passa como argumento enterpriseModel.
 #### A variável idUserLevelDTO é do tipo Long,recebe o método createUserLevelByEnterprise(),passando o id vindo de enterpriseCreated.A variável idSectorDTO é do tipo Long,recebe o método createSectorByEnterprise(),passando o id vindo de enterpriseCreated.A variável cepDefault é do tipo String e recebe um cep padrão.
 #### A variável employeeDTO,é do tipo EmployeeDTO,e recebe uma nova instâcia de EmployeeDTO acompanhado dos seguites parâmetros: id = null, firstame = "root", lastName = null, dateNasciment = LocalDate.of(2003,10,06), gender = "others", sector = idSectorDTO, cep = cepDefault, cnpjEnterprise = enterpriseCreated.getCnpj(), userLevel = idUserLevelDTO, login = enterpriseCreated.getCnpj().concat("root"), password = "123", token = null.Logo após acesso o método createEmployeeService() de employeeService passando employeeDTO como argumento.
-#### O retorno é um mapeamento de enterpriseModel para EnterpriseDTO.
+#### Retorna enterpriseModel.
 
 <br>
 
 #### • findAllEnterprises
 ```
 public Page<EnterpriseDTO> findAllEnterprises(Pageable pageable){
-    List<Enterprise> enterprises = enterpriseRepository.findAll();
+    Page<Enterprise> enterprises = enterpriseRepository.findAll(pageable);
     if(enterprises.isEmpty()){
         throw new NotFoundException("Empresas",'a');
     }
 
-    return enterpriseRepository
-            .findAll(pageable)
+    return enterprises
             .map(enterprise ->
                 modelMapper.map(enterprise,EnterpriseDTO.class)
             );
 }
 ```
 #### O método retorna Page<EnterpriseDTO>,e recebe como parâmetro,pageable do tipo Pageable.
-#### A variável enterprises,é do tipo List<Enterprise>,e recebe o método findAll() de enterpriseRepository,é verificado se enterprises é vazio,se for é lançada uma nova exceção de NotFoundException,passando "Empresas" e 'a' como argumento. 
-#### O retorno é o método findAll() acesso por enterpriseRepository,passando como argumento pageable,acessando método map,passando como parâmetro enterprise e realizando um mapeamento de dados de enterprise para EnterpriseDTO.
+#### A variável enterprises,é do tipo Page<Enterprise>,e recebe o método findAll() de enterpriseRepository,passando pageable como argumento. 
+#### É verificado se enterprises é vazio,se for é lançada uma nova exceção de NotFoundException,passando "Empresas" e 'a' como argumento. 
+#### O retorno é o método map() de enterprises,que passa como parâmetro enterprise e realizando um mapeamento de dados de enterprise para EnterpriseDTO.
 
 <br>
 
@@ -1376,8 +1393,8 @@ public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id
 #### • createEnterprise - POST
 ```
 public ResponseEntity<ResponseMessageStatus> createEnterprise(@RequestBody EnterpriseDTO enterprise, UriComponentsBuilder uriBuilder){
-        EnterpriseDTO enterpriseDTO=enterpriseService.createEnterpriseService(enterprise);
-        Long enterpriseId = enterpriseDTO.getId();
+        Enterprise enterpriseModel=enterpriseService.createEnterpriseService(enterprise);
+        Long enterpriseId = enterpriseModel.getId();
         URI path = uriBuilder.path("/enterprises/{id}").buildAndExpand(enterpriseId).toUri();
 
         String message="Empresa criada com sucesso!";
@@ -1391,8 +1408,8 @@ public ResponseEntity<ResponseMessageStatus> createEnterprise(@RequestBody Enter
     }
 ```
 #### O método retorna ResponseEntity<ResponseMessageStatus>,recebe como parâmetros enterprise do tipo EnterpriseDTO pela anotação "RequestBody",e uriBuilder do tipo UriComponentsBuilder.
-#### A variável enterpriseDTO,é do tipo EnterpriseDTO,acessa o método createEnterpriseService() de enterpriseService,passando como argumento enterprise.
-#### A variável enterpriseId,é do tipo Long,recebe o id de enterpriseDTO.
+#### A variável enterpriseModel,é do tipo Enterprise,acessa o método createEnterpriseService() de enterpriseService,passando como argumento enterprise.
+#### A variável enterpriseId,é do tipo Long,recebe o id de enterpriseModel.
 #### A variável path,é do tipo URI,e acessa o método path() de uriBuilder,passando como argumento o caminho até o id,acessa o método buildAndExpand,passando como argumento enterpriseId,e acessa por fim o método toUri().
 #### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status é do tipo Integer,e recebe um valor personalizado.A variável response é do tipo ResponseMessageStatus,e recebe uma nova instância de ResponseMessageStatus,passando message e status como argumento.   
 #### Retorna o método created() de ResponseEntity,passando como argumento a variável path,acessa o método body() passando como argumento a variável response. 
