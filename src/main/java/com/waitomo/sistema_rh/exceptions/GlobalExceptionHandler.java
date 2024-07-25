@@ -26,4 +26,10 @@ public class GlobalExceptionHandler {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(), "Registro já existente");
         return new ResponseEntity<>(errorResponse,HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(TokenNullOrEmptyException.class)
+    public ResponseEntity<ErrorResponseDTO> handleTokenNullOrEmptyException(TokenNullOrEmptyException ex){
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(ex.getMessage(), "Token nulo ou vazio");
+        return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
+    }
 }
