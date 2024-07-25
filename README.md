@@ -148,15 +148,24 @@
 #### message - String
 #### details - String
 
+<br>
+
 ### • ResponseMessageStatus
 #### message - String
 #### status - Integer
 
 <br>
 
-### • TokenResponse
+### • TokenRequestDTO
 #### login - String
 #### token - String
+
+<br>
+
+### • TokenResponseDTO
+#### token - String
+#### message - String
+#### status - Integer
 
 <br>
 
@@ -1374,8 +1383,8 @@ public ResponseEntity<ResponseMessageStatus> login(@RequestBody LoginResponseDTO
 
 #### • validateToken - "/token/{id}" - POST
 ```
-public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id, @RequestBody TokenResponse tokenResponse){
-    ResponseMessageStatus response = service.verifyToken(id,tokenResponse.token());
+public ResponseEntity<ResponseMessageStatus> validateToken(@PathVariable Long id, @RequestBody TokenRequestDTO tokenResponse){
+    ResponseMessageStatus response = service.verifyToken(id,tokenRequestDTO.token());
 
     return ResponseEntity.ok(response);
 }
@@ -1852,8 +1861,5 @@ public ResponseEntity<Void> deletePointById(@PathVariable Long id){
 <br>
 
 
-
-// adicionar no findAll dos services,além de enterprises,uma verificação
-// adicionar mais exceptions
 // mudar tokenResponse para tokenRequest
 // fazer consultas select com join para trazer os dados de userLevel por exemplo,trazendo o nome em vez do numero,no caso criar DTO's personalizados pra retornar essas buscas nos métodos GET
