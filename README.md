@@ -181,7 +181,6 @@
 <br>
 
 ### • UserLevelDTO
-#### id - Long
 #### name - String
 #### enterprise_id - Long
 
@@ -674,40 +673,45 @@ public Long createSectorByEnterprise(Long enterpriseId){
 
 #### • createUserLevelService
 ```
-public ResponseMessageStatus createUserLevelService(UserLevelDTO userLevel){
+public UserLevel createUserLevelService(UserLevelDTO userLevel){
     UserLevel userLevelModel = modelMapper.map(userLevel, UserLevel.class);
     userLevelModel.setName(userLevel.getName());
+
     if(!existEnterpriseId(userLevel.getEnterprise_id())){
-        throw new EntityNotFoundException("ID da empresa não encontrado");
+        throw new NotFoundException("ID da empresa",'o');
     }
 
     userLevelModel.setEnterprise_id(userLevel.getEnterprise_id());
     repository.save(userLevelModel);
 
-    String message = "Nível de usuário criado com sucesso";
-    Integer status = 201;
-
-    return new ResponseMessageStatus(message,status);
+    return userLevelModel;
 }
 ```
-#### O método é do tipo ResponseMessageStatus,e recebe como parâmetro,userLevel do tipo UserLevelDTO.
+#### O método é do tipo UserLevel,e recebe como parâmetro,userLevel do tipo UserLevelDTO.
 #### A variável userLevelModel,é do tipo UserLevel,recebe um mapeamento através do método map() que passa userLevel que é um DTO,para a entidade UserLevel.Logo após seto o name em userLevelModel,que passa por argumento 
-#### É verificado se o método existEnterpriseId() que passa o enterpriseId vindo ded userLevel como argumento,retorna false,se retornar false lança uma exceção EntityNotFoundException com uma mensagem personalizada.
+#### É verificado se o método existEnterpriseId() que passa o enterpriseId vindo ded userLevel como argumento,retorna false,se retornar false lança uma exceção NotFoundException com uma mensagem personalizada.
 #### Se passar da condição,é setado o enterpriseId na variável userLevelModel,e por fim acessado o método save() de repository,passando como a argumento userLevelModel.
-#### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status é do tipo Integer,e recebe um valor personalizado.Por fim retorna uma nova instância de ResponseMessageStatus,passando como argumentos message e status.
+#### Retorna userLevelModel. 
 
 <br>
 
 #### • getAllUserLevelService
 ```
 public Page<UserLevelDTO> getAllUserLevelService(Pageable pageable){
-    return repository
-            .findAll(pageable)
+    Page<UserLevel> userLevelPage = repository.findAll(pageable);
+
+    if(userLevelPage.isEmpty()){
+        throw new NotFoundException("Níveis de usuário",'o');
+    }
+
+    return userLevelPage
             .map(userLevel -> modelMapper.map(userLevel, UserLevelDTO.class));
 }
 ```
 #### O método retorna Page<UserLevelDTO>,e recebe como parâmetro,pageable que é do tipo Pageable.
-#### Retorna o método findAll() vindo de repository,que passa por argumento pageable,e acessa o método map(),passando por parâmetro userLevel,que realiza o mapeamento de userLevel para UserLevelDTO.
+#### A variável userLevelPage,é do tipo Page<UserLevel>,e recebe o método findAll() de repository passando pageable como argumento.
+#### É verificado se userLevelPage é vazio,se for,será lançado uma nova exceção de NotFoundException,passando "Níveis de usuário" e 'o' como argumentos.
+#### Retorna o método map() de userLevelPage,passa por parâmetro userLevel,que realiza o mapeamento de userLevel para UserLevelDTO.
 
 <br>
 
@@ -716,13 +720,13 @@ public Page<UserLevelDTO> getAllUserLevelService(Pageable pageable){
 public UserLevelDTO getUserLevelByIdService(Long id){
     existsUserLevel(id);
 
-    UserLevel userLevel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nível de Usuário nnão encontrado"));
+    UserLevel userLevel = repository.findById(id).orElseThrow(() -> new NotFoundException("Nível de Usuário",'o'));
     return modelMapper.map(userLevel, UserLevelDTO.class);
 }
 ```
 #### O método retorna UserLevelDTO,e recebe como parâmetro id do tipo Long.
 #### Acessa o método existsUserLevel() que passa id como argumento.
-#### A variável userLevel é do tipo UserLevel,e acessa o método findById() vindo de repository,passa como argumento o id,e acessa o método orElseThrow(),lançando uma exceção EntityNotFoundException com uma mensagem personalizada caso não ache o id do userLevel.   
+#### A variável userLevel é do tipo UserLevel,e acessa o método findById() vindo de repository,passa como argumento o id,e acessa o método orElseThrow(),lançando uma exceção NotFoundException com uma mensagem personalizada caso não ache o id do userLevel.   
 #### Retorna um mapeamento através do método map() de userLevel para UserLevelDTO.
 
 <br>
@@ -732,7 +736,7 @@ public UserLevelDTO getUserLevelByIdService(Long id){
 public ResponseMessageStatus updateUserLevelByIdService(Long id,UserLevelDTO userLevelDTO){
     existsUserLevel(id);
 
-    UserLevel userLevel = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Nível de Usuário não encontrado"));
+    UserLevel userLevel = repository.findById(id).orElseThrow(() -> new NotFoundException("Nível de Usuário",'o'));
     userLevel.setName(userLevelDTO.getName());
     userLevel.setEnterprise_id(userLevelDTO.getEnterprise_id());
     repository.save(userLevel);
@@ -744,7 +748,7 @@ public ResponseMessageStatus updateUserLevelByIdService(Long id,UserLevelDTO use
 ```
 #### O método é do tipo ResponseMessageStatus,e recebe por parâmetros,id do tipo Long,e userLevelDTO do tipo UserLevelDTO.
 #### Acessa o método existsUserLevel() passando id como argumento.
-#### A variável userLevel,é do tipo UserLevel,e recebe o método findById() de repository,passando id como argumento,acessando o método orElseThrow() que lançará uma nova exceção EntityNotFoundException com uma mensagem personalizada.
+#### A variável userLevel,é do tipo UserLevel,e recebe o método findById() de repository,passando id como argumento,acessando o método orElseThrow() que lançará uma nova exceção NotFoundException com uma mensagem personalizada.
 #### É setado em userLevel,name e enterpriseId vindos de userLevelDTO.Acessa o método save() de repository,passando como argumento userLevel.
 #### A variável message é do tipo String,e recebe uma mensagem personalizada.A variável status é do tipo Integer,e recebe um valor personalizado.Por fim retorna uma nova instância de ResponseMessageStatus,passando como argumentos message e status.
 
@@ -770,13 +774,13 @@ public void existsUserLevel(Long id){
     boolean existsUserLevelById = repository.existsById(id);
 
     if(!existsUserLevelById){
-        throw new EntityNotFoundException("Nível de Usuário não encontrado");
+        throw new NotFoundException("Nível de Usuário",'o');
     }
 }
 ```
 #### O método não tem retorno,e recebe o parâmetro id que é do tipo Long.
 #### A variável existsUserLevelById é do tipo boolean,que acessa existsById() de repository,passando id como argumento. 
-#### É verificado se o retorno de existsUserLevelById é false,se for,é lançado uma nova exceção EntityNotFoundException com uma mensagem persoalizada.
+#### É verificado se o retorno de existsUserLevelById é false,se for,é lançado uma nova exceção NotFoundException com uma mensagem persoalizada.
 
 <br>
 
