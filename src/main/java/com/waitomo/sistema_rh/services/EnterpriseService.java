@@ -44,7 +44,7 @@ public class EnterpriseService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public EnterpriseDTO createEnterpriseService(EnterpriseDTO enterprise){
+    public Enterprise createEnterpriseService(EnterpriseDTO enterprise){
         Enterprise enterpriseModel = new Enterprise();
 
         enterpriseModel.setCnpj(enterprise.getCnpj());
@@ -79,7 +79,7 @@ public class EnterpriseService {
                 null);
         employeeService.createEmployeeService(employeeDTO);
 
-        return modelMapper.map(enterpriseModel,EnterpriseDTO.class);
+        return enterpriseModel;
     }
 
     public Page<EnterpriseDTO> findAllEnterprises(Pageable pageable){
