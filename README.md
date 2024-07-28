@@ -1835,31 +1835,345 @@ public ResponseEntity<Void> deletePointById(@PathVariable Long id){
 
 <br>
 
-### Enterprise | createEnterprise
+### UserLevel | POST | /userLevel
 ```
-{
-    "cnpj":"29973118736421",
-    "fantasy_name":"teste3",
-    "company_name":"teste3",
-    "number_employees":"0"
-}
+    {
+      "name": "Admin",
+      "enterprise_id": 1
+    }
 ```
 
 <br>
 
-### Enterprise | getAllEnterprises
+### UserLevel | GET | /userLevel
 ```
-{
-  "page": 0,
-  "size": 1,
-  "sort": [
-
-  ]
-}
+    {
+      "page": 0,
+      "size": 1,
+      "sort": [
+        
+      ]
+    }
 ```
 
 <br>
 
+### UserLevel | GET | /userLevel/{id}
+```
+    1
+```
 
-// mudar tokenResponse para tokenRequest
-// fazer consultas select com join para trazer os dados de userLevel por exemplo,trazendo o nome em vez do numero,no caso criar DTO's personalizados pra retornar essas buscas nos métodos GET
+<br>
+
+### UserLevel | PUT | /userLevel/{id}
+```
+    1
+    
+    {
+      "name": "Supervisor",
+      "enterprise_id": 1
+    }
+```
+
+<br>
+
+### UserLevel | DELETE | /userLevel/{id}
+```
+    1
+```
+
+
+<br><br>
+
+### Sector | POST | /sector
+```
+    {
+      "name": "Financeiro",
+      "enterprise_id": 1
+    }
+```
+
+<br>
+
+### Sector | GET | /sector
+```
+    {
+      "page": 0,
+      "size": 1,
+      "sort": [
+        
+      ]
+    }
+```
+
+<br>
+
+### Sector | GET | /sector/{id}
+```
+    1
+```
+
+<br>
+
+### Sector | PUT | /sector/{id}
+```
+    1
+    
+    {
+      "name": "T.I",
+      "enterprise_id": 1
+    }
+```
+
+<br>
+
+### Sector | DELETE | /sector/{id}
+```
+    1
+```
+
+<br><br>
+
+### Point | POST | /point
+```
+    {
+      "employeeId": 1,
+      "date": "2024-07-28",
+      "checkInTime": {
+        "hour": 07,
+        "minute": 30,
+        "second": 0,
+        "nano": 0
+      },
+      "checkOutLunch": {
+        "hour": 11,
+        "minute": 10,
+        "second": 35,
+        "nano": 0
+      },
+      "backLunch": {
+        "hour": 14,
+        "minute": 30,
+        "second": 10,
+        "nano": 20
+      },
+      "checkOutTime": {
+        "hour": 17,
+        "minute": 59,
+        "second": 50,
+        "nano": 45
+      }
+    }
+```
+
+<br>
+
+### Point | GET | /point
+```
+    {
+      "page": 0,
+      "size": 1,
+      "sort": [
+        
+      ]
+    }
+```
+
+<br>
+
+### Point | GET | /point/{id}
+```
+    1
+```
+
+<br>
+
+### Point | PUT | /point/{id}
+```
+    1
+    
+    {
+      "employeeId": 1,
+      "date": "2024-07-28",
+      "checkInTime": {
+        "hour": 07,
+        "minute": 30,
+        "second": 0,
+        "nano": 0
+      },
+      "checkOutLunch": {
+        "hour": 11,
+        "minute": 29,
+        "second": 35,
+        "nano": 0
+      },
+      "backLunch": {
+        "hour": 14,
+        "minute": 35,
+        "second": 10,
+        "nano": 20
+      },
+      "checkOutTime": {
+        "hour": 18,
+        "minute": 00,
+        "second": 00,
+        "nano": 45
+      }
+    }
+```
+
+<br>
+
+### Point | DELETE | /point/{id}
+```
+    1
+```
+
+<br>
+
+<br><br>
+
+### Enterprise | POST | /enterprises
+```
+    {
+        "cnpj":"29973118736421",
+        "fantasy_name":"teste",
+        "company_name":"teste",
+        "number_employees":"0"
+    }
+```
+
+<br>
+
+### Enterprise | GET | /enterprises
+```
+    {
+      "page": 0,
+      "size": 1,
+      "sort": [
+    
+      ]
+    }
+```
+
+<br>
+
+### Enterprise | GET | /enterprises/{id} | Necessita do token
+```
+    1
+```
+
+<br>
+
+### Enterprise | PUT | /enterprises/{id} | Necessita do token
+```
+    1
+    
+    {
+        "cnpj":"29973118736421",
+        "fantasy_name":"teste",
+        "company_name":"teste",
+        "number_employees":"1"
+    }
+```
+
+<br>
+
+### Enterprise | DELETE | /enterprises/{id} | Necessita do token
+```
+    1
+```
+
+<br><br>
+
+### Employee | POST | /employee | Necessita do token
+```
+    {
+      "firstName": "Joalisson",
+      "lastName": "Pinto Maia",
+      "dateNasciment": "2003-10-06",
+      "gender": "masculino",
+      "sector": 1,
+      "cep": "44096000",
+      "cnpjEnterprise": "29973118736421",
+      "userLevel": 1,
+      "login": "29973118736421joca",
+      "password": "12345678"
+    }
+```
+
+<br>
+
+### Employee | GET | /employee | Necessita do token
+```
+    {
+        {
+          "page": 0,
+          "size": 1,
+          "sort": [
+        
+          ]
+        }
+    }
+```
+
+<br>
+
+### Employee | GET | /employee/{id} | Necessita do token
+```
+   1
+```
+
+<br>
+
+### Employee | PUT | /employee/{id} | Necessita do token
+```
+   1
+   
+   {
+      "firstName": "Joalisson",
+      "lastName": "Maia",
+      "dateNasciment": "2003-10-06",
+      "gender": "masculino",
+      "sector": 2,
+      "cep": "44096000",
+      "cnpjEnterprise": "29973118736421",
+      "userLevel": 2,
+      "login": "29973118736421joca",
+      "password": "12345678"
+   }
+```
+
+<br>
+
+### Employee | DELETE | /employee/{id} | Necessita do token
+```
+   1
+```
+
+<br><br>
+
+### Login | POST | /login 
+```
+    {
+        "login": "29973118736421joca",
+        "password": "12345678"
+    }
+```
+
+<br>
+
+### Login | POST | /login/token/{id}
+```
+    {
+        "login": "29973118736421joca",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    }
+```
+
+<br><br>
+
+### EmployeeAddress | POST | /address
+```
+    44096000
+```
